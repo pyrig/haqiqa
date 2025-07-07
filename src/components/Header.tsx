@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -15,9 +16,11 @@ const Header = () => {
         <button className="text-gray-600 hover:text-gray-800 px-4 py-2">
           log in
         </button>
-        <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg">
-          sign up
-        </Button>
+        <Link to="/signup">
+          <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg">
+            sign up
+          </Button>
+        </Link>
       </div>
     </header>
   );

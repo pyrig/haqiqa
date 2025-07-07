@@ -1,8 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import UserPost from "@/components/UserPost";
 import FeatureCard from "@/components/FeatureCard";
 import Footer from "@/components/Footer";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -20,9 +22,11 @@ const Index = () => {
               Postsy is a thoughtful social platform designed for meaningful connections and authentic expression in a supportive online community.
             </p>
             <div className="flex gap-4">
-              <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
-                join postsy
-              </Button>
+              <Link to="/signup">
+                <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
+                  join postsy
+                </Button>
+              </Link>
             </div>
           </div>
           
@@ -100,9 +104,11 @@ const Index = () => {
           <p className="text-lg text-teal-100 mb-8 max-w-2xl mx-auto">
             Start sharing your story and connecting with others who value authentic expression.
           </p>
-          <Button className="bg-white text-teal-500 hover:bg-gray-50 px-8 py-3 rounded-lg text-base font-medium">
-            get started today
-          </Button>
+          <Link to="/signup">
+            <Button className="bg-white text-teal-500 hover:bg-gray-50 px-8 py-3 rounded-lg text-base font-medium">
+              get started today
+            </Button>
+          </Link>
         </div>
       </div>
       
