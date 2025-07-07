@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -132,7 +133,10 @@ const Dashboard = () => {
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+                  <div 
+                    className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer"
+                    onClick={() => navigate('/settings')}
+                  >
                     <Settings className="w-5 h-5" />
                     <span>Settings</span>
                   </div>
