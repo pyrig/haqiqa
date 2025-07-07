@@ -155,7 +155,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate('/settings')}
                 >
                   Edit profile
                 </Button>
