@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +31,7 @@ import FeedView from "@/components/FeedView";
 import DiscoveryView from "@/components/DiscoveryView";
 import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
+import BookmarksView from "@/components/BookmarksView";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const Dashboard = () => {
   const { suggestedUsers, followUser, checkIfFollowing, isFollowing } = useFollows();
   const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'feed' | 'discovery'>('feed');
+  const [activeView, setActiveView] = useState<'feed' | 'discovery' | 'bookmarks'>('feed');
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -127,8 +127,8 @@ const Dashboard = () => {
                 <span>Discovery</span>
               </div>
               <div 
-                className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer"
-                onClick={() => navigate('/bookmarks')}
+                className={`flex items-center gap-3 cursor-pointer ${activeView === 'bookmarks' ? 'text-teal-500 font-medium' : 'text-gray-600 hover:text-gray-800'}`}
+                onClick={() => setActiveView('bookmarks')}
               >
                 <Bookmark className="w-5 h-5" />
                 <span>Bookmarks</span>
@@ -181,7 +181,9 @@ const Dashboard = () => {
           </div>
 
           <div className="flex-1 max-w-2xl p-6">
-            {activeView === 'feed' ? <FeedView /> : <DiscoveryView />}
+            {activeView === 'feed' && <FeedView />}
+            {activeView === 'discovery' && <DiscoveryView />}
+            {activeView === 'bookmarks' && <BookmarksView />}
           </div>
 
           <div className="w-80 p-6">

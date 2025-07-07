@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -10,27 +9,48 @@ export const useBookmarks = () => {
   const { data: bookmarks = [], isLoading } = useQuery({
     queryKey: ['bookmarks'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: bookmarksData, error: bookmarksError } = await supabase
         .from('bookmarks')
-        .select(`
-          *,
-          posts!inner (
-            *,
-            profiles!inner (
-              username,
-              display_name,
-              avatar_url
-            )
-          )
-        `)
+        .select('*, posts(*)')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching bookmarks:', error);
-        throw error;
+      if (bookmarksError) {
+        console.error('Error fetching bookmarks:', bookmarksError);
+        throw bookmarksError;
       }
+
+      if (!bookmarksData || bookmarksData.length === 0) return [];
+
+      // Get all unique user IDs from posts
+      const userIds = [...new Set(bookmarksData.map(bookmark => bookmark.posts.user_id))];
       
-      return data || [];
+      // Fetch profiles for all users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, display_name, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      // Create a map of profiles by user ID
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Combine bookmarks with profile data
+      return bookmarksData.map(bookmark => ({
+        ...bookmark,
+        posts: {
+          ...bookmark.posts,
+          media_urls: Array.isArray(bookmark.posts.media_urls) ? bookmark.posts.media_urls as string[] : [],
+          hashtags: bookmark.posts.hashtags || [],
+          profiles: profilesMap.get(bookmark.posts.user_id) || null
+        }
+      }));
     },
   });
 
