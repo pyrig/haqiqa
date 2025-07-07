@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import UserPost from "@/components/UserPost";
@@ -23,9 +22,6 @@ const Index = () => {
             <div className="flex gap-4">
               <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
                 join postsy
-              </Button>
-              <Button variant="outline" className="border-teal-500 text-teal-500 hover:bg-teal-50 px-8 py-3 rounded-lg text-base">
-                learn more
               </Button>
             </div>
           </div>
