@@ -160,9 +160,6 @@ const Dashboard = () => {
               <DropdownMenuItem onClick={() => navigate('/settings')}>
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                sign out
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
