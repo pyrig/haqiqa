@@ -16,11 +16,6 @@ const SignUp = () => {
       <div className="flex-1 bg-teal-500 text-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto text-center">
           <div className="mb-8">
-            <img 
-              src="/lovable-uploads/4fcc4fe8-d044-4e52-9023-8395ec6f2d31.png" 
-              alt="Postsy Logo" 
-              className="h-12 mx-auto mb-4"
-            />
             <h1 className="text-4xl font-bold mb-4">Postsy</h1>
           </div>
           
