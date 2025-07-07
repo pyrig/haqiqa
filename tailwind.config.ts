@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,11 +85,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'wiggle': {
+					'0%, 100%': { 
+						transform: 'rotate(-3deg) translateX(0px)' 
+					},
+					'25%': { 
+						transform: 'rotate(3deg) translateX(2px)' 
+					},
+					'50%': { 
+						transform: 'rotate(-2deg) translateX(-1px)' 
+					},
+					'75%': { 
+						transform: 'rotate(2deg) translateX(1px)' 
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'wiggle': 'wiggle 3s ease-in-out infinite'
 			}
 		}
 	},

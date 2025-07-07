@@ -25,7 +25,10 @@ const Index = () => {
                 <img 
                   src="/lovable-uploads/e3ba89ef-d82e-42be-abc9-779381073154.png" 
                   alt="Mouse mascot" 
-                  className="absolute -top-8 -right-2 w-8 h-8 z-10"
+                  className="absolute -top-8 -right-2 w-8 h-8 z-10 animate-bounce hover:animate-pulse cursor-pointer transform-gpu"
+                  style={{
+                    animation: 'bounce 2s infinite, wiggle 3s ease-in-out infinite'
+                  }}
                 />
                 <Link to="/signup">
                   <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
