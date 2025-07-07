@@ -49,7 +49,7 @@ export const usePosts = () => {
         throw error;
       }
       
-      return data || [];
+      return (data || []) as Post[];
     },
   });
 
