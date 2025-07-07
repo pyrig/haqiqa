@@ -238,7 +238,8 @@ const Settings = () => {
           <img 
             src="/lovable-uploads/f11eefd3-0739-4f93-8e2b-3a50d356e52d.png" 
             alt="Postsy Logo" 
-            className="h-8"
+            className="h-8 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/dashboard')}
           />
         </div>
         
