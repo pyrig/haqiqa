@@ -49,7 +49,13 @@ export const usePosts = () => {
         throw error;
       }
       
-      return (data || []) as Post[];
+      // Transform the data to match our Post interface
+      return (data || []).map(post => ({
+        ...post,
+        media_urls: Array.isArray(post.media_urls) ? post.media_urls : [],
+        hashtags: post.hashtags || [],
+        profiles: post.profiles || null
+      })) as Post[];
     },
   });
 
