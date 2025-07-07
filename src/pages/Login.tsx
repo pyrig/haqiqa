@@ -133,6 +133,11 @@ const Login = () => {
               Back
             </Link>
             <div className="text-center">
+              <img 
+                src="/lovable-uploads/970d7a3b-5e2a-40df-8452-29fa2ec359c9.png" 
+                alt="Postsy Logo" 
+                className="h-16 mx-auto mb-6"
+              />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
               <p className="text-gray-600">Welcome back! Please enter your credentials</p>
             </div>
