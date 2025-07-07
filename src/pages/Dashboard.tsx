@@ -177,16 +177,16 @@ const Dashboard = () => {
                 <div className="ml-4">const dp = Array(rows).fill().map(() => Array(cols).fill(0));</div>
                 <div className="ml-4 mt-2">dp[0][0] = grid[0][0];</div>
                 <div className="ml-4 mt-2">// Fill first row</div>
-                <div className="ml-4">for (let j = 1; j &lt; cols; j++) {'{'}</div>
+                <div className="ml-4">for (let j = 1; j {'<'} cols; j++) {'{'}</div>
                 <div className="ml-8">dp[0][j] = dp[0][j-1] + grid[0][j];</div>
                 <div className="ml-4">{'}'}</div>
                 <div className="ml-4 mt-2">// Fill first column</div>
-                <div className="ml-4">for (let i = 1; i &lt; rows; i++) {'{'}</div>
+                <div className="ml-4">for (let i = 1; i {'<'} rows; i++) {'{'}</div>
                 <div className="ml-8">dp[i][0] = dp[i-1][0] + grid[i][0];</div>
                 <div className="ml-4">{'}'}</div>
                 <div className="ml-4 mt-2">// Fill rest of dp table</div>
-                <div className="ml-4">for (let i = 1; i &lt; rows; i++) {'{'}</div>
-                <div className="ml-8">for (let j = 1; j &lt; cols; j++) {'{'}</div>
+                <div className="ml-4">for (let i = 1; i {'<'} rows; i++) {'{'}</div>
+                <div className="ml-8">for (let j = 1; j {'<'} cols; j++) {'{'}</div>
                 <div className="ml-12">dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]) + grid[i][j];</div>
                 <div className="ml-8">{'}'}</div>
                 <div className="ml-4">{'}'}</div>
