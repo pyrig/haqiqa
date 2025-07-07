@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Home, 
   Compass, 
@@ -30,6 +36,7 @@ const Dashboard = () => {
   const { user, loading, signOut, isAuthenticated } = useAuth();
   const { suggestedUsers, followUser, checkIfFollowing, isFollowing } = useFollows();
   const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
+  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -144,18 +151,27 @@ const Dashboard = () => {
                 <h3 className="font-medium text-gray-700 mb-2">Anonymous Mode</h3>
                 <p className="text-sm text-gray-600 mb-3">Post without linking to your profile</p>
               </div>
-              <Button 
-                className="w-full bg-teal-500 hover:bg-teal-600 text-white"
-                onClick={() => document.querySelector('textarea')?.focus()}
-              >
-                New Post
-              </Button>
+              
+              <Dialog open={isPostDialogOpen} onOpenChange={setIsPostDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
+                    New Post
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Create New Post</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <EnhancedPostComposer onPostCreated={() => setIsPostDialogOpen(false)} />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="flex-1 max-w-2xl p-6">
-            <EnhancedPostComposer />
             <PostFeed />
           </div>
 

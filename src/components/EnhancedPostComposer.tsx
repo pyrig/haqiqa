@@ -10,7 +10,11 @@ import { usePosts } from '@/hooks/usePosts';
 import RichTextEditor from './RichTextEditor';
 import MediaUpload from './MediaUpload';
 
-const EnhancedPostComposer = () => {
+interface EnhancedPostComposerProps {
+  onPostCreated?: () => void;
+}
+
+const EnhancedPostComposer = ({ onPostCreated }: EnhancedPostComposerProps) => {
   const [content, setContent] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [privacyLevel, setPrivacyLevel] = useState<'public' | 'followers' | 'private'>('public');
@@ -36,11 +40,15 @@ const EnhancedPostComposer = () => {
     setPrivacyLevel('public');
     setContentWarning('');
     setMediaUrls([]);
+
+    // Call the callback to close dialog
+    if (onPostCreated) {
+      onPostCreated();
+    }
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border">
-      <h2 className="text-lg font-medium mb-4">What's on your mind?</h2>
+    <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="border rounded-md">
           <RichTextEditor
