@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -178,20 +177,6 @@ const SignUp = () => {
               <span className="mr-2">👤</span>
               Create Account
             </Button>
-            
-            <div className="text-center">
-              <p className="text-gray-500 mb-4">Or continue with</p>
-              <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                  <span className="mr-2 text-red-500">G</span>
-                  Google
-                </Button>
-                <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                  <span className="mr-2">🐙</span>
-                  GitHub
-                </Button>
-              </div>
-            </div>
             
             <p className="text-center text-gray-600">
               Already have an account?{" "}
