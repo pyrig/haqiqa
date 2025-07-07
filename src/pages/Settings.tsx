@@ -238,7 +238,7 @@ const Settings = () => {
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center">
           <img 
-            src="/lovable-uploads/f11eefd3-0739-4f93-8e2b-3a50d356e52d.png" 
+            src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
             alt="Postsy Logo" 
             className="h-8 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/dashboard')}
