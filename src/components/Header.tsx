@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 const Header = () => {
   return (
     <header className="flex justify-between items-center py-6 px-8 bg-white">
-      <div className="text-2xl font-semibold text-gray-900">
-        postsy
+      <div className="flex items-center">
+        <img 
+          src="/lovable-uploads/4fcc4fe8-d044-4e52-9023-8395ec6f2d31.png" 
+          alt="Postsy Logo" 
+          className="h-8"
+        />
       </div>
       <div className="flex gap-4">
         <button className="text-gray-600 hover:text-gray-800 px-4 py-2">
