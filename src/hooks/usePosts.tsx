@@ -11,6 +11,8 @@ interface Post {
   hashtags: string[];
   created_at: string;
   user_id: string;
+  privacy_level?: string;
+  content_warning?: string;
   profiles?: {
     username: string | null;
     display_name: string | null;
@@ -37,7 +39,7 @@ export const usePosts = () => {
         .from('posts')
         .select(`
           *,
-          profiles!inner (
+          profiles (
             username,
             display_name,
             avatar_url
