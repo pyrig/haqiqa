@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 interface Profile {
   id: string;
@@ -41,6 +42,8 @@ const Settings = () => {
     bio: ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
+  const [deactivatePassword, setDeactivatePassword] = useState('');
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -154,13 +157,61 @@ const Settings = () => {
     }
   };
 
-  const handleDeactivate = async () => {
-    if (!user) return;
-    
-    if (confirm("Are you sure you want to deactivate your account? This action cannot be easily reversed.")) {
-      // For now, just sign out - in a real app you'd implement proper deactivation
+  const handleDeactivate = () => {
+    setShowDeactivateDialog(true);
+  };
+
+  const confirmDeactivate = async () => {
+    if (!user || !deactivatePassword) {
+      toast({
+        title: "Password required",
+        description: "Please enter your password to confirm account deletion.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // First, verify the password by attempting to update user with current password
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: deactivatePassword
+      });
+
+      if (passwordError) {
+        toast({
+          title: "Invalid password",
+          description: "Please check your password and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Delete all user data from profiles table
+      await supabase.from('profiles').delete().eq('id', user.id);
+      await supabase.from('posts').delete().eq('user_id', user.id);
+      await supabase.from('replies').delete().eq('user_id', user.id);
+      await supabase.from('bookmarks').delete().eq('user_id', user.id);
+      await supabase.from('follows').delete().eq('follower_id', user.id);
+      await supabase.from('follows').delete().eq('following_id', user.id);
+
+      // Sign out and redirect
       await signOut();
       navigate("/");
+      
+      toast({
+        title: "Account deleted",
+        description: "Your account has been permanently deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeactivateDialog(false);
+      setDeactivatePassword('');
     }
   };
 
@@ -437,6 +488,52 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      {/* Deactivate Account Dialog */}
+      <Dialog open={showDeactivateDialog} onOpenChange={setShowDeactivateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+            <DialogDescription>
+              This action is permanent and cannot be undone. All your data, posts, and profile information will be permanently deleted.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Label htmlFor="deactivate-password" className="text-sm font-medium text-gray-900 mb-2 block">
+              Enter your password to confirm <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="deactivate-password"
+              type="password"
+              value={deactivatePassword}
+              onChange={(e) => setDeactivatePassword(e.target.value)}
+              placeholder="Enter your current password"
+              className="w-full"
+            />
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowDeactivateDialog(false);
+                setDeactivatePassword('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeactivate}
+              disabled={!deactivatePassword}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
