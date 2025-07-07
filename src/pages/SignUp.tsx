@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -131,7 +132,7 @@ const SignUp = () => {
         <div className="max-w-md mx-auto text-center">
           <div className="mb-8">
             <img 
-              src="/lovable-uploads/d7498e3c-fb4d-4545-983d-bd8ce8f538bf.png" 
+              src="/lovable-uploads/fe06c680-a6fc-4055-aba0-6ab99d731af2.png" 
               alt="Postsy Logo" 
               className="h-16 mx-auto mb-4"
             />
