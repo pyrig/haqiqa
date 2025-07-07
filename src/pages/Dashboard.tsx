@@ -23,12 +23,16 @@ import {
   Share,
   LogOut
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     // Handle logout logic here
     console.log("Logging out...");
-    // You can add actual logout functionality here
+    // Navigate to the landing page
+    navigate("/");
   };
 
   return (
