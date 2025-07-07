@@ -1,9 +1,14 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Home, 
   Compass, 
@@ -15,10 +20,17 @@ import {
   Tag,
   MessageCircle,
   RotateCcw,
-  Share
+  Share,
+  LogOut
 } from "lucide-react";
 
 const Dashboard = () => {
+  const handleLogout = () => {
+    // Handle logout logic here
+    console.log("Logging out...");
+    // You can add actual logout functionality here
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
@@ -55,10 +67,20 @@ const Dashboard = () => {
                 <User className="w-5 h-5" />
                 <span>Profile</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
-                <Settings className="w-5 h-5" />
-                <span>Settings</span>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+                    <Settings className="w-5 h-5" />
+                    <span>Settings</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
 
             <div className="mt-12">
