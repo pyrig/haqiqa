@@ -4,10 +4,17 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Eye, Home, Bell, Bookmark, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simulate login - in real app, you'd validate credentials
+    navigate('/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -80,7 +87,7 @@ const Login = () => {
             </div>
           </div>
           
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <Label htmlFor="email" className="text-gray-700 font-medium">Email or Username</Label>
               <div className="mt-1">
@@ -122,7 +129,7 @@ const Login = () => {
               </a>
             </div>
             
-            <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 text-base font-medium">
+            <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 text-base font-medium">
               Sign In
             </Button>
             

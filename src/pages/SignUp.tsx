@@ -1,15 +1,21 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Eye, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simulate signup - in real app, you'd create account
+    navigate('/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -77,7 +83,7 @@ const SignUp = () => {
             <p className="text-gray-600">Join thousands of creators sharing their stories</p>
           </div>
           
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName" className="text-gray-700 font-medium">First Name</Label>
@@ -179,16 +185,16 @@ const SignUp = () => {
               </div>
             </div>
             
-            <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 text-base font-medium">
+            <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 text-base font-medium">
               <span className="mr-2">👤</span>
               Create Account
             </Button>
             
             <p className="text-center text-gray-600">
               Already have an account?{" "}
-              <a href="#" className="text-teal-500 hover:text-teal-600 font-medium">
+              <Link to="/login" className="text-teal-500 hover:text-teal-600 font-medium">
                 Sign in
-              </a>
+              </Link>
             </p>
           </form>
         </div>
