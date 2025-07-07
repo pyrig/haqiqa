@@ -7,7 +7,7 @@ const Header = () => {
     <header className="flex justify-between items-center py-6 px-8 bg-white">
       <div className="flex items-center">
         <img 
-          src="/lovable-uploads/c431732d-6d39-496c-a38b-b2b52ec46e2d.png" 
+          src="/lovable-uploads/d225d4da-e13c-4a15-8645-7814497a20ff.png" 
           alt="Postsy Logo" 
           className="h-8"
         />
