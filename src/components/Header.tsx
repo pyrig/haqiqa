@@ -13,9 +13,11 @@ const Header = () => {
         />
       </div>
       <div className="flex gap-4">
-        <button className="text-gray-600 hover:text-gray-800 px-4 py-2">
-          log in
-        </button>
+        <Link to="/login">
+          <button className="text-gray-600 hover:text-gray-800 px-4 py-2">
+            log in
+          </button>
+        </Link>
         <Link to="/signup">
           <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg">
             sign up
