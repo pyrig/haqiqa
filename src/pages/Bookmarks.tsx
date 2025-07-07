@@ -61,7 +61,11 @@ const Bookmarks = () => {
                   ? bookmark.posts.media_urls as string[] 
                   : [],
                 hashtags: bookmark.posts.hashtags || [],
-                profiles: bookmark.posts.profiles || null
+                profiles: bookmark.posts.profiles ? {
+                  username: bookmark.posts.profiles.username || '',
+                  display_name: bookmark.posts.profiles.display_name || '',
+                  avatar_url: bookmark.posts.profiles.avatar_url || ''
+                } : null
               };
               
               return (
