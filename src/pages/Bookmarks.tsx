@@ -1,6 +1,6 @@
 
 import { useBookmarks } from '@/hooks/useBookmarks';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
+import FeedPostCard from '@/components/FeedPostCard';
 
 const Bookmarks = () => {
   const { bookmarks, isLoading } = useBookmarks();
@@ -65,7 +65,7 @@ const Bookmarks = () => {
               };
               
               return (
-                <EnhancedPostCard key={bookmark.id} post={post} />
+                <FeedPostCard key={bookmark.id} post={post} />
               );
             })}
           </div>

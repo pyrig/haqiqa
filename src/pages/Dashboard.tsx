@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +28,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useFollows } from "@/hooks/useFollows";
 import EnhancedPostComposer from "@/components/EnhancedPostComposer";
-import PostFeed from "@/components/PostFeed";
+import FeedView from "@/components/FeedView";
+import DiscoveryView from "@/components/DiscoveryView";
 import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 
@@ -37,6 +39,7 @@ const Dashboard = () => {
   const { suggestedUsers, followUser, checkIfFollowing, isFollowing } = useFollows();
   const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [activeView, setActiveView] = useState<'feed' | 'discovery'>('feed');
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -109,13 +112,19 @@ const Dashboard = () => {
         <div className="flex max-w-6xl w-full">
           <div className="w-64 bg-white h-screen p-6 border-r">
             <nav className="space-y-4">
-              <div className="flex items-center gap-3 text-teal-500 font-medium">
+              <div 
+                className={`flex items-center gap-3 cursor-pointer font-medium ${activeView === 'feed' ? 'text-teal-500' : 'text-gray-600 hover:text-gray-800'}`}
+                onClick={() => setActiveView('feed')}
+              >
                 <Home className="w-5 h-5" />
-                <span>Home</span>
+                <span>Feed</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+              <div 
+                className={`flex items-center gap-3 cursor-pointer ${activeView === 'discovery' ? 'text-teal-500 font-medium' : 'text-gray-600 hover:text-gray-800'}`}
+                onClick={() => setActiveView('discovery')}
+              >
                 <Compass className="w-5 h-5" />
-                <span>Discover</span>
+                <span>Discovery</span>
               </div>
               <div 
                 className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer"
@@ -172,7 +181,7 @@ const Dashboard = () => {
           </div>
 
           <div className="flex-1 max-w-2xl p-6">
-            <PostFeed />
+            {activeView === 'feed' ? <FeedView /> : <DiscoveryView />}
           </div>
 
           <div className="w-80 p-6">
