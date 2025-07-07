@@ -35,6 +35,7 @@ const Settings = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [formData, setFormData] = useState({
     display_name: '',
+    email: '',
     pronouns: '',
     bio: ''
   });
@@ -66,6 +67,7 @@ const Settings = () => {
           setProfile(data);
           setFormData({
             display_name: data.display_name || '',
+            email: user?.email || '',
             pronouns: '', // Add pronouns field to profiles table if needed
             bio: data.bio || ''
           });
@@ -94,6 +96,21 @@ const Settings = () => {
 
     setIsSaving(true);
     try {
+      // Update email if changed
+      if (formData.email !== user.email) {
+        const { error: emailError } = await supabase.auth.updateUser({
+          email: formData.email
+        });
+        
+        if (emailError) throw emailError;
+        
+        toast({
+          title: "Email update initiated",
+          description: "Please check your new email for confirmation.",
+        });
+      }
+
+      // Update profile data
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -304,6 +321,20 @@ const Settings = () => {
                   id="display_name"
                   value={formData.display_name}
                   onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
+                  className="max-w-md"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium text-gray-900 mb-2 block">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="max-w-md"
                 />
               </div>
