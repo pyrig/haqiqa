@@ -165,7 +165,7 @@ const Settings = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-1 text-gray-700 hover:bg-gray-100 px-3 py-1 h-auto">
-                {user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'user'}
+                {profile?.display_name || profile?.username || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'user'}
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
