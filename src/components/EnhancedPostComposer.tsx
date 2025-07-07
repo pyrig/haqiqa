@@ -17,7 +17,7 @@ interface EnhancedPostComposerProps {
 const EnhancedPostComposer = ({ onPostCreated }: EnhancedPostComposerProps) => {
   const [content, setContent] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [privacyLevel, setPrivacyLevel] = useState<'public' | 'followers' | 'private'>('public');
+  const [privacyLevel, setPrivacyLevel] = useState<'public' | 'followers'>('public');
   const [contentWarning, setContentWarning] = useState('');
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const { createPost, isCreating } = usePosts();
@@ -78,14 +78,13 @@ const EnhancedPostComposer = ({ onPostCreated }: EnhancedPostComposerProps) => {
               <Label htmlFor="privacy" className="text-sm text-gray-600">
                 Privacy:
               </Label>
-              <Select value={privacyLevel} onValueChange={(value: 'public' | 'followers' | 'private') => setPrivacyLevel(value)}>
+              <Select value={privacyLevel} onValueChange={(value: 'public' | 'followers') => setPrivacyLevel(value)}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="public">Public</SelectItem>
                   <SelectItem value="followers">Followers</SelectItem>
-                  <SelectItem value="private">Private</SelectItem>
                 </SelectContent>
               </Select>
             </div>
