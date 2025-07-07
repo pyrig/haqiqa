@@ -14,23 +14,42 @@ import {
   Bookmark, 
   User, 
   Settings, 
-  LogOut
+  LogOut,
+  UserPlus
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import PostComposer from "@/components/PostComposer";
+import { useFollows } from "@/hooks/useFollows";
+import EnhancedPostComposer from "@/components/EnhancedPostComposer";
 import PostFeed from "@/components/PostFeed";
-import { useEffect } from "react";
+import SearchBar from "@/components/SearchBar";
+import { useEffect, useState } from "react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, signOut, isAuthenticated } = useAuth();
+  const { suggestedUsers, followUser, checkIfFollowing, isFollowing } = useFollows();
+  const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate("/login");
     }
   }, [loading, isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const checkFollowingStatus = async () => {
+      const status: {[key: string]: boolean} = {};
+      for (const user of suggestedUsers) {
+        status[user.id] = await checkIfFollowing(user.id);
+      }
+      setFollowingStatus(status);
+    };
+
+    if (suggestedUsers.length > 0) {
+      checkFollowingStatus();
+    }
+  }, [suggestedUsers, checkIfFollowing]);
 
   const handleLogout = async () => {
     try {
@@ -39,6 +58,11 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error logging out:", error);
     }
+  };
+
+  const handleFollowUser = (userId: string) => {
+    followUser(userId);
+    setFollowingStatus(prev => ({ ...prev, [userId]: true }));
   };
 
   if (loading) {
@@ -60,7 +84,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
       <header className="bg-teal-500 text-white px-6 py-4">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
               src="/lovable-uploads/360ec68b-0e2d-45c9-a1e9-84aca66b0284.png" 
@@ -68,6 +92,10 @@ const Dashboard = () => {
               className="h-8"
             />
           </div>
+          <div className="flex-1 max-w-md mx-8">
+            <SearchBar />
+          </div>
+          <div></div>
         </div>
       </header>
 
@@ -84,7 +112,10 @@ const Dashboard = () => {
                 <Compass className="w-5 h-5" />
                 <span>Discover</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+              <div 
+                className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer"
+                onClick={() => navigate('/bookmarks')}
+              >
                 <Bookmark className="w-5 h-5" />
                 <span>Bookmarks</span>
               </div>
@@ -113,7 +144,10 @@ const Dashboard = () => {
                 <h3 className="font-medium text-gray-700 mb-2">Anonymous Mode</h3>
                 <p className="text-sm text-gray-600 mb-3">Post without linking to your profile</p>
               </div>
-              <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
+              <Button 
+                className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                onClick={() => document.querySelector('textarea')?.focus()}
+              >
                 New Post
               </Button>
             </div>
@@ -121,7 +155,7 @@ const Dashboard = () => {
 
           {/* Main Content */}
           <div className="flex-1 max-w-2xl p-6">
-            <PostComposer />
+            <EnhancedPostComposer />
             <PostFeed />
           </div>
 
@@ -131,50 +165,35 @@ const Dashboard = () => {
             <div className="bg-white rounded-lg p-4 mb-6 shadow-sm border">
               <h3 className="font-medium text-gray-900 mb-4">Suggested Users</h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">TW</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-sm">techwriter</div>
-                      <div className="text-xs text-gray-500">@techwriter</div>
+                {suggestedUsers.map((suggestedUser) => (
+                  <div key={suggestedUser.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-8 h-8">
+                        {suggestedUser.avatar_url ? (
+                          <AvatarImage src={suggestedUser.avatar_url} />
+                        ) : null}
+                        <AvatarFallback className="bg-teal-100 text-teal-600 text-xs">
+                          {(suggestedUser.display_name || suggestedUser.username || 'U').charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-sm">{suggestedUser.display_name || suggestedUser.username}</div>
+                        {suggestedUser.username && (
+                          <div className="text-xs text-gray-500">@{suggestedUser.username}</div>
+                        )}
+                      </div>
                     </div>
+                    <Button
+                      size="sm"
+                      variant={followingStatus[suggestedUser.id] ? "outline" : "ghost"}
+                      className="text-teal-500 hover:text-teal-600"
+                      onClick={() => handleFollowUser(suggestedUser.id)}
+                      disabled={isFollowing || followingStatus[suggestedUser.id]}
+                    >
+                      <UserPlus className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button size="sm" variant="ghost" className="text-teal-500 hover:text-teal-600">
-                    <User className="w-4 h-4" />
-                  </Button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-green-100 text-green-600 text-xs">TB</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-sm">travelbug</div>
-                      <div className="text-xs text-gray-500">@travelbug</div>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost" className="text-teal-500 hover:text-teal-600">
-                    <User className="w-4 h-4" />
-                  </Button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-red-100 text-red-600 text-xs">ML</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-sm">musiclover</div>
-                      <div className="text-xs text-gray-500">@musiclover</div>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost" className="text-teal-500 hover:text-teal-600">
-                    <User className="w-4 h-4" />
-                  </Button>
-                </div>
+                ))}
               </div>
             </div>
 

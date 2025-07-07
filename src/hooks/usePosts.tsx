@@ -23,6 +23,7 @@ interface CreatePostData {
   is_anonymous?: boolean;
   media_urls?: string[];
   privacy_level?: 'public' | 'followers' | 'private';
+  content_warning?: string;
 }
 
 export const usePosts = () => {
@@ -36,7 +37,7 @@ export const usePosts = () => {
         .from('posts')
         .select(`
           *,
-          profiles (
+          profiles!inner (
             username,
             display_name,
             avatar_url

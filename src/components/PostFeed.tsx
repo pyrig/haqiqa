@@ -1,6 +1,6 @@
 
 import { usePosts } from '@/hooks/usePosts';
-import PostCard from './PostCard';
+import EnhancedPostCard from './EnhancedPostCard';
 
 const PostFeed = () => {
   const { posts, isLoading } = usePosts();
@@ -39,7 +39,7 @@ const PostFeed = () => {
   return (
     <div>
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <EnhancedPostCard key={post.id} post={post} />
       ))}
     </div>
   );
