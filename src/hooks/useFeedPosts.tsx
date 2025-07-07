@@ -26,11 +26,25 @@ export const useFeedPosts = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
+      // First get followed user IDs
+      const { data: follows, error: followsError } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
+
+      if (followsError) {
+        console.error('Error fetching follows:', followsError);
+        throw followsError;
+      }
+
+      const followedIds = follows?.map(f => f.following_id) || [];
+      const allUserIds = [user.id, ...followedIds];
+
       // Get posts from followed users and own posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
-        .or(`user_id.eq.${user.id},user_id.in.(select following_id from follows where follower_id = ${user.id})`)
+        .in('user_id', allUserIds)
         .order('created_at', { ascending: false });
 
       if (postsError) {

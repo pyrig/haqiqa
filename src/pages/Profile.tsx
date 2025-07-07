@@ -1,12 +1,13 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, MapPin, Link2, Users, FileText } from 'lucide-react';
+import { ArrowLeft, Calendar, Settings, Users, FileText, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
+import FeedPostCard from '@/components/FeedPostCard';
 
 interface Profile {
   id: string;
@@ -28,6 +29,7 @@ interface Post {
   media_urls?: string[];
   content_warning?: string;
   privacy_level?: string;
+  user_id: string;
   profiles?: {
     username: string;
     display_name: string;
@@ -45,6 +47,7 @@ const Profile = () => {
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -76,26 +79,32 @@ const Profile = () => {
         if (postsError) {
           console.error('Error fetching posts:', postsError);
         } else {
-          // Fetch profile data for each post separately
-          const postsWithProfiles = await Promise.all(
-            (postsData || []).map(async (post) => {
-              const { data: postProfile } = await supabase
-                .from('profiles')
-                .select('username, display_name, avatar_url')
-                .eq('id', post.user_id)
-                .single();
-
-              return {
-                ...post,
-                media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
-                hashtags: post.hashtags || [],
-                profiles: postProfile || null
-              } as Post;
-            })
-          );
+          // Add profile data to each post
+          const postsWithProfiles = (postsData || []).map(post => ({
+            ...post,
+            media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
+            hashtags: post.hashtags || [],
+            profiles: {
+              username: profileData.username,
+              display_name: profileData.display_name,
+              avatar_url: profileData.avatar_url
+            }
+          } as Post));
           
           setPosts(postsWithProfiles);
           setPostsCount(postsWithProfiles.length);
+        }
+
+        // Check if current user is following this profile
+        if (user && user.id !== profileData.id) {
+          const { data: followData } = await supabase
+            .from('follows')
+            .select('id')
+            .eq('follower_id', user.id)
+            .eq('following_id', profileData.id)
+            .single();
+          
+          setIsFollowing(!!followData);
         }
 
         // Fetch followers count
@@ -122,7 +131,36 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [username]);
+  }, [username, user]);
+
+  const handleFollowToggle = async () => {
+    if (!user || !profile) return;
+
+    try {
+      if (isFollowing) {
+        await supabase
+          .from('follows')
+          .delete()
+          .eq('follower_id', user.id)
+          .eq('following_id', profile.id);
+        
+        setIsFollowing(false);
+        setFollowersCount(prev => prev - 1);
+      } else {
+        await supabase
+          .from('follows')
+          .insert({
+            follower_id: user.id,
+            following_id: profile.id
+          });
+        
+        setIsFollowing(true);
+        setFollowersCount(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -138,15 +176,16 @@ const Profile = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-teal-500 text-white px-6 py-4">
+        <header className="bg-white border-b px-6 py-4">
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/dashboard')}
-              className="text-white hover:bg-teal-600"
+              className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
+              Back
             </Button>
             <h1 className="text-xl font-semibold">Profile Not Found</h1>
           </div>
@@ -165,17 +204,31 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-teal-500 text-white px-6 py-4">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/dashboard')}
-            className="text-white hover:bg-teal-600"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <h1 className="text-xl font-semibold">{profile.display_name || profile.username}</h1>
+      <header className="bg-white border-b px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <h1 className="text-xl font-semibold">{profile.display_name || profile.username}</h1>
+          </div>
+          {isOwnProfile && (
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/settings')}
+              className="flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Settings
+            </Button>
+          )}
         </div>
       </header>
 
@@ -199,8 +252,11 @@ const Profile = () => {
                   <p className="text-gray-500">@{profile.username}</p>
                 </div>
                 {!isOwnProfile && (
-                  <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-                    Follow
+                  <Button 
+                    onClick={handleFollowToggle}
+                    className={isFollowing ? "bg-gray-200 text-gray-800 hover:bg-gray-300" : "bg-teal-500 hover:bg-teal-600 text-white"}
+                  >
+                    {isFollowing ? 'Following' : 'Follow'}
                   </Button>
                 )}
               </div>
@@ -237,7 +293,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Posts */}
+        {/* Posts Feed */}
         <div>
           {posts.length === 0 ? (
             <div className="bg-white rounded-lg p-8 shadow-sm border text-center">
@@ -249,7 +305,7 @@ const Profile = () => {
           ) : (
             <div>
               {posts.map((post) => (
-                <EnhancedPostCard key={post.id} post={post} />
+                <FeedPostCard key={post.id} post={post} />
               ))}
             </div>
           )}
