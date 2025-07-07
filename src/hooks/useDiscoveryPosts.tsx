@@ -25,44 +25,65 @@ export const useDiscoveryPosts = () => {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       
-      let query = supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles!inner (
-            username,
-            display_name,
-            avatar_url
-          )
-        `)
-        .eq('privacy_level', 'public')
-        .order('created_at', { ascending: false });
-
-      // If user is logged in, exclude their own posts and posts from followed users
+      let excludeIds: string[] = [];
+      
       if (user) {
+        // Get followed user IDs
         const { data: follows } = await supabase
           .from('follows')
           .select('following_id')
           .eq('follower_id', user.id);
         
         const followedIds = follows?.map(f => f.following_id) || [];
-        const excludeIds = [user.id, ...followedIds];
-        
+        excludeIds = [user.id, ...followedIds];
+      }
+
+      // Get public posts excluding own posts and posts from followed users
+      let query = supabase
+        .from('posts')
+        .select('*')
+        .eq('privacy_level', 'public')
+        .order('created_at', { ascending: false });
+
+      if (excludeIds.length > 0) {
         query = query.not('user_id', 'in', `(${excludeIds.join(',')})`);
       }
 
-      const { data, error } = await query;
+      const { data: postsData, error: postsError } = await query;
 
-      if (error) {
-        console.error('Error fetching discovery posts:', error);
-        throw error;
+      if (postsError) {
+        console.error('Error fetching discovery posts:', postsError);
+        throw postsError;
       }
 
-      return (data || []).map(post => ({
+      if (!postsData || postsData.length === 0) return [];
+
+      // Get all unique user IDs from posts
+      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      
+      // Fetch profiles for all users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, display_name, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      // Create a map of profiles by user ID
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Combine posts with profile data
+      return postsData.map(post => ({
         ...post,
         media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
         hashtags: post.hashtags || [],
-        profiles: post.profiles || null
+        profiles: profilesMap.get(post.user_id) || null
       } as Post));
     },
   });
