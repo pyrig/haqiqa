@@ -155,7 +155,7 @@ const Settings = () => {
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center">
           <img 
-            src="/lovable-uploads/bf6190f7-321f-432c-8f11-43de941cf67d.png" 
+            src="/lovable-uploads/f11eefd3-0739-4f93-8e2b-3a50d356e52d.png" 
             alt="Postsy Logo" 
             className="h-8"
           />
