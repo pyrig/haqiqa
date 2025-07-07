@@ -49,9 +49,9 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -63,18 +63,18 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-gray-50 font-sans">
       {/* Top Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <div className="text-2xl font-bold text-purple-900">
-          cohost
+        <div className="text-2xl font-medium text-gray-900">
+          postsy
         </div>
         
         <div className="flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-1 text-gray-700 hover:bg-gray-100 px-3 py-1 h-auto">
-                jordanwminor
+                {user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'user'}
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -93,7 +93,7 @@ const Dashboard = () => {
           
           <Dialog open={isPostDialogOpen} onOpenChange={setIsPostDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-1 h-auto text-sm">
+              <Button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-1 h-auto text-sm">
                 post
               </Button>
             </DialogTrigger>
@@ -118,36 +118,40 @@ const Dashboard = () => {
         <div className="w-80 bg-white">
           <div className="p-4">
             {/* Profile Card */}
-            <div className="rounded-lg overflow-hidden mb-4" style={{ backgroundColor: '#8B4B8C' }}>
+            <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
               <div className="p-6 text-white text-center">
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20">
-                  <img 
-                    src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
-                    alt="Jordan Minor"
-                    className="w-full h-full object-cover"
-                  />
+                  <Avatar className="w-full h-full">
+                    {user?.user_metadata?.avatar_url ? (
+                      <AvatarImage src={user.user_metadata.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-600 text-white text-2xl">
+                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 
-                <h2 className="text-xl font-bold mb-1">
-                  Jordan Minor
+                <h2 className="text-xl font-medium mb-1">
+                  {user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User'}
                 </h2>
                 
-                <p className="text-purple-200 text-sm mb-2">
-                  @jordanwminor
+                <p className="text-teal-100 text-sm mb-2">
+                  @{user?.email?.split('@')[0] || 'user'}
                 </p>
                 
-                <div className="flex items-center justify-center gap-1 text-purple-200 text-sm mb-2">
+                <div className="flex items-center justify-center gap-1 text-teal-100 text-sm mb-2">
                   <span>👤</span>
-                  <span>he/him</span>
+                  <span>they/them</span>
                 </div>
                 
-                <p className="text-purple-200 text-sm mb-6">
-                  video game words
+                <p className="text-teal-100 text-sm mb-6">
+                  sharing thoughts & creativity
                 </p>
                 
                 <Button 
                   variant="outline" 
-                  className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-full font-medium"
+                  className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
+                  onClick={() => navigate('/profile')}
                 >
                   Edit profile
                 </Button>
@@ -157,12 +161,7 @@ const Dashboard = () => {
             {/* Report Bug Button */}
             <Button 
               variant="outline" 
-              className="w-full flex items-center justify-center gap-2 rounded-full font-medium py-2"
-              style={{ 
-                backgroundColor: '#FCE7F3', 
-                borderColor: '#F9A8D4', 
-                color: '#BE185D' 
-              }}
+              className="w-full flex items-center justify-center gap-2 rounded-lg font-medium py-2 bg-teal-50 border-teal-200 text-teal-600 hover:bg-teal-100"
             >
               <Bug className="w-4 h-4" />
               report a bug
@@ -174,41 +173,37 @@ const Dashboard = () => {
         <div className="flex-1 bg-white">
           {/* Header Banner */}
           <div className="h-52 relative overflow-hidden">
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 50%, #374151 100%)'
-              }}
-            />
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
+            <div className="absolute top-0 right-0 w-20 h-20 bg-teal-100 rounded-full opacity-50"></div>
+            <div className="absolute bottom-10 left-10 w-12 h-12 bg-teal-200 rounded-full opacity-60"></div>
+            <div className="absolute top-20 left-0 w-8 h-8 bg-teal-300 rounded-full opacity-40"></div>
           </div>
 
           {/* Filter Bar */}
           <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
             <Button 
               size="sm"
-              className="text-white px-3 py-1 h-auto text-sm font-medium"
-              style={{ backgroundColor: '#8B4B8C' }}
+              className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
             >
               show shares
             </Button>
             <Button 
               variant="outline"
               size="sm"
-              className="text-gray-600 border-gray-300 px-3 py-1 h-auto text-sm"
+              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
             >
               hide shares
             </Button>
             <Button 
               size="sm"
-              className="text-white px-3 py-1 h-auto text-sm font-medium"
-              style={{ backgroundColor: '#8B4B8C' }}
+              className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
             >
               show replies
             </Button>
             <Button 
               variant="outline"
               size="sm"
-              className="text-gray-600 border-gray-300 px-3 py-1 h-auto text-sm"
+              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
             >
               hide replies
             </Button>
@@ -220,22 +215,25 @@ const Dashboard = () => {
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <img 
-                    src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
-                    alt="Jordan Minor"
-                    className="w-full h-full object-cover"
-                  />
+                  <Avatar>
+                    {user?.user_metadata?.avatar_url ? (
+                      <AvatarImage src={user.user_metadata.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-100 text-teal-600">
+                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-bold text-black">Jordan Minor</span>
-                    <span className="text-gray-500">@jordanwminor</span>
+                    <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
+                    <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
                     <span className="text-gray-500">·</span>
                     <span className="text-gray-500">18 days ago</span>
                     <div className="flex items-center gap-2 ml-auto">
                       <Repeat className="w-4 h-4 text-gray-500" />
-                      <span className="font-bold text-black">Jordan Minor</span>
-                      <span className="text-gray-500">@jordanwminor</span>
+                      <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
+                      <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
                       <MoreHorizontal className="w-5 h-5 text-gray-400 ml-2" />
                     </div>
                   </div>
@@ -247,35 +245,38 @@ const Dashboard = () => {
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <img 
-                    src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
-                    alt="Jordan Minor"
-                    className="w-full h-full object-cover"
-                  />
+                  <Avatar>
+                    {user?.user_metadata?.avatar_url ? (
+                      <AvatarImage src={user.user_metadata.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-100 text-teal-600">
+                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 text-sm mb-3">
-                    <span className="font-bold text-black">Jordan Minor</span>
-                    <span className="text-gray-500">@jordanwminor</span>
+                    <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
+                    <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
                     <span className="text-gray-500">·</span>
                     <span className="text-gray-500">2 mo. ago</span>
                     <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
                   </div>
                   
                   <div className="mb-4">
-                    <h3 className="text-2xl font-bold mb-2 text-black">finally</h3>
+                    <h3 className="text-2xl font-medium mb-2 text-gray-900">finally</h3>
                     <p className="text-gray-800 mb-4 text-base">a new place to post</p>
                     <p className="text-gray-500 text-sm">0 comments</p>
                   </div>
 
                   <div className="flex items-center gap-3 justify-end">
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
                       <Edit3 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
                       <Heart className="w-4 h-4" />
                     </Button>
                   </div>
@@ -287,16 +288,19 @@ const Dashboard = () => {
             <div className="px-6 py-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <img 
-                    src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
-                    alt="Jordan Minor"
-                    className="w-full h-full object-cover"
-                  />
+                  <Avatar>
+                    {user?.user_metadata?.avatar_url ? (
+                      <AvatarImage src={user.user_metadata.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-100 text-teal-600">
+                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 text-sm mb-3">
-                    <span className="font-bold text-black">Jordan Minor</span>
-                    <span className="text-gray-500">@jordanwminor</span>
+                    <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
+                    <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
                     <span className="text-gray-500">·</span>
                     <span className="text-gray-500">2 mo. ago</span>
                     <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
@@ -308,10 +312,10 @@ const Dashboard = () => {
                   </div>
 
                   <div className="flex items-center gap-3 justify-end">
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
                       <Repeat className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
                       <Heart className="w-4 h-4" />
                     </Button>
                   </div>
