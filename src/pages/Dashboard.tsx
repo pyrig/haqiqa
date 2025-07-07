@@ -92,11 +92,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-teal-500 text-white px-6 py-4">
+      <header className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/360ec68b-0e2d-45c9-a1e9-84aca66b0284.png" 
+              src="/lovable-uploads/c431732d-6d39-496c-a38b-b2b52ec46e2d.png" 
               alt="Postsy Logo" 
               className="h-8"
             />
