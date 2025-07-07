@@ -1,9 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Eye } from "lucide-react";
+import { Eye, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const SignUp = () => {
@@ -16,7 +17,11 @@ const SignUp = () => {
       <div className="flex-1 bg-teal-500 text-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto text-center">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4">Postsy</h1>
+            <img 
+              src="/lovable-uploads/2130448e-6c06-4ea0-806e-c6f050d2b62b.png" 
+              alt="Postsy Logo" 
+              className="h-16 mx-auto mb-4"
+            />
           </div>
           
           <h2 className="text-2xl font-semibold mb-6">Join the conversation</h2>
@@ -61,6 +66,12 @@ const SignUp = () => {
       {/* Right Panel */}
       <div className="flex-1 bg-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
+          {/* Back Button */}
+          <Link to="/" className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-8">
+            <ArrowLeft size={20} className="mr-2" />
+            Back to home
+          </Link>
+          
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Create your account</h2>
             <p className="text-gray-600">Join thousands of creators sharing their stories</p>
