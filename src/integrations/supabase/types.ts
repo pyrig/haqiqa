@@ -9,6 +9,35 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmarks_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       communities: {
         Row: {
           avatar_url: string | null
@@ -124,6 +153,27 @@ export type Database = {
         }
         Relationships: []
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       message_reactions: {
         Row: {
           created_at: string | null
@@ -200,13 +250,55 @@ export type Database = {
           },
         ]
       }
+      posts: {
+        Row: {
+          content: string
+          content_warning: string | null
+          created_at: string
+          hashtags: string[] | null
+          id: string
+          is_anonymous: boolean | null
+          media_urls: Json | null
+          privacy_level: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          content_warning?: string | null
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          is_anonymous?: boolean | null
+          media_urls?: Json | null
+          privacy_level?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          content_warning?: string | null
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          is_anonymous?: boolean | null
+          media_urls?: Json | null
+          privacy_level?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           created_at: string | null
+          display_name: string | null
           full_name: string | null
           id: string
+          is_private: boolean | null
+          theme_color: string | null
           updated_at: string | null
           username: string | null
         }
@@ -214,8 +306,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          display_name?: string | null
           full_name?: string | null
           id: string
+          is_private?: boolean | null
+          theme_color?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -223,19 +318,60 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          display_name?: string | null
           full_name?: string | null
           id?: string
+          is_private?: boolean | null
+          theme_color?: string | null
           updated_at?: string | null
           username?: string | null
         }
         Relationships: []
+      }
+      replies: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      extract_hashtags: {
+        Args: { content: string }
+        Returns: string[]
+      }
     }
     Enums: {
       [_ in never]: never
