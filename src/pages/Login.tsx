@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,15 +71,12 @@ const Login = () => {
           <form className="space-y-6">
             <div>
               <Label htmlFor="email" className="text-gray-700 font-medium">Email or Username</Label>
-              <div className="mt-1 relative">
+              <div className="mt-1">
                 <Input 
                   id="email" 
                   type="text" 
-                  className="border-gray-300 focus:border-teal-500 focus:ring-teal-500 pl-10"
+                  className="border-gray-300 focus:border-teal-500 focus:ring-teal-500"
                 />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
-                </div>
               </div>
             </div>
             
@@ -90,11 +86,8 @@ const Login = () => {
                 <Input 
                   id="password" 
                   type={showPassword ? "text" : "password"} 
-                  className="border-gray-300 focus:border-teal-500 focus:ring-teal-500 pl-10 pr-10"
+                  className="border-gray-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
                 />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <div className="w-4 h-4 bg-gray-400 rounded-sm"></div>
-                </div>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -118,23 +111,8 @@ const Login = () => {
             </div>
             
             <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 text-base font-medium">
-              <span className="mr-2">🔐</span>
               Sign In
             </Button>
-            
-            <div className="text-center">
-              <p className="text-gray-600 mb-4">Or continue with</p>
-              <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" className="border-gray-300 hover:bg-gray-50">
-                  <span className="mr-2 text-red-500">G</span>
-                  Google
-                </Button>
-                <Button variant="outline" className="border-gray-300 hover:bg-gray-50">
-                  <span className="mr-2">⚫</span>
-                  GitHub
-                </Button>
-              </div>
-            </div>
             
             <p className="text-center text-gray-600">
               Don't have an account?{" "}
