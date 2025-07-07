@@ -9,6 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { 
+  Home, 
+  Compass, 
+  Bookmark, 
+  User, 
   Settings, 
   LogOut,
   UserPlus
@@ -16,8 +20,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useFollows } from "@/hooks/useFollows";
+import EnhancedPostComposer from "@/components/EnhancedPostComposer";
+import PostFeed from "@/components/PostFeed";
 import SearchBar from "@/components/SearchBar";
-import TabNavigation from "@/components/TabNavigation";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
@@ -90,28 +95,68 @@ const Dashboard = () => {
           <div className="flex-1 max-w-md mx-8">
             <SearchBar />
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-white hover:text-white hover:bg-teal-600">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div></div>
         </div>
       </header>
 
       <div className="flex justify-center">
         <div className="flex max-w-6xl w-full">
-          {/* Main Content with Tabs */}
+          {/* Left Sidebar */}
+          <div className="w-64 bg-white h-screen p-6 border-r">
+            <nav className="space-y-4">
+              <div className="flex items-center gap-3 text-teal-500 font-medium">
+                <Home className="w-5 h-5" />
+                <span>Home</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+                <Compass className="w-5 h-5" />
+                <span>Discover</span>
+              </div>
+              <div 
+                className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer"
+                onClick={() => navigate('/bookmarks')}
+              >
+                <Bookmark className="w-5 h-5" />
+                <span>Bookmarks</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+                <User className="w-5 h-5" />
+                <span>Profile</span>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
+                    <Settings className="w-5 h-5" />
+                    <span>Settings</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </nav>
+
+            <div className="mt-12">
+              <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                <h3 className="font-medium text-gray-700 mb-2">Anonymous Mode</h3>
+                <p className="text-sm text-gray-600 mb-3">Post without linking to your profile</p>
+              </div>
+              <Button 
+                className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                onClick={() => document.querySelector('textarea')?.focus()}
+              >
+                New Post
+              </Button>
+            </div>
+          </div>
+
+          {/* Main Content */}
           <div className="flex-1 max-w-2xl p-6">
-            <TabNavigation />
+            <EnhancedPostComposer />
+            <PostFeed />
           </div>
 
           {/* Right Sidebar */}
