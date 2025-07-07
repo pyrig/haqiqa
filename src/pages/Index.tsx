@@ -25,7 +25,7 @@ const Index = () => {
                 <img 
                   src="/lovable-uploads/e3ba89ef-d82e-42be-abc9-779381073154.png" 
                   alt="Mouse mascot" 
-                  className="absolute -top-12 left-1/2 transform -translate-x-1/2 w-8 h-8 z-10"
+                  className="absolute -top-8 -right-2 w-8 h-8 z-10"
                 />
                 <Link to="/signup">
                   <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
