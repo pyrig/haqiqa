@@ -179,7 +179,7 @@ const SignUp = () => {
           
           <div className="text-center mb-8">
             <img 
-              src="/lovable-uploads/5270032c-fbf1-47bc-98b0-761f2772e2ec.png" 
+              src="/lovable-uploads/d225d4da-e13c-4a15-8645-7814497a20ff.png" 
               alt="Postsy Logo" 
               className="h-16 mx-auto mb-6"
             />
