@@ -53,9 +53,21 @@ const Bookmarks = () => {
           </div>
         ) : (
           <div>
-            {bookmarks.map((bookmark) => (
-              <EnhancedPostCard key={bookmark.id} post={bookmark.posts} />
-            ))}
+            {bookmarks.map((bookmark) => {
+              // Transform the bookmark data to match Post interface
+              const post = {
+                ...bookmark.posts,
+                media_urls: Array.isArray(bookmark.posts.media_urls) 
+                  ? bookmark.posts.media_urls as string[] 
+                  : [],
+                hashtags: bookmark.posts.hashtags || [],
+                profiles: bookmark.posts.profiles || null
+              };
+              
+              return (
+                <EnhancedPostCard key={bookmark.id} post={post} />
+              );
+            })}
           </div>
         )}
       </div>

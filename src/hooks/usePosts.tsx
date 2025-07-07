@@ -39,7 +39,7 @@ export const usePosts = () => {
         .from('posts')
         .select(`
           *,
-          profiles (
+          profiles!posts_user_id_fkey (
             username,
             display_name,
             avatar_url
@@ -55,7 +55,7 @@ export const usePosts = () => {
       // Transform the data to match our Post interface
       return (data || []).map(post => ({
         ...post,
-        media_urls: Array.isArray(post.media_urls) ? post.media_urls : [],
+        media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
         hashtags: post.hashtags || [],
         profiles: post.profiles || null
       })) as Post[];

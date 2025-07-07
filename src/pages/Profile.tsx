@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -71,7 +70,7 @@ const Profile = () => {
           .from('posts')
           .select(`
             *,
-            profiles (
+            profiles!posts_user_id_fkey (
               username,
               display_name,
               avatar_url
@@ -86,7 +85,7 @@ const Profile = () => {
         } else {
           const transformedPosts = (postsData || []).map(post => ({
             ...post,
-            media_urls: Array.isArray(post.media_urls) ? post.media_urls : [],
+            media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
             hashtags: post.hashtags || [],
             profiles: post.profiles || null
           })) as Post[];
