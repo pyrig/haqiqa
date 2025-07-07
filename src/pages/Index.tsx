@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import UserPost from "@/components/UserPost";
@@ -21,12 +20,19 @@ const Index = () => {
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               Postsy is a thoughtful social platform designed for meaningful connections and authentic expression in a supportive online community.
             </p>
-            <div className="flex gap-4">
-              <Link to="/signup">
-                <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
-                  join postsy
-                </Button>
-              </Link>
+            <div className="flex gap-4 relative">
+              <div className="relative">
+                <img 
+                  src="/lovable-uploads/e3ba89ef-d82e-42be-abc9-779381073154.png" 
+                  alt="Mouse mascot" 
+                  className="absolute -top-12 left-1/2 transform -translate-x-1/2 w-8 h-8 z-10"
+                />
+                <Link to="/signup">
+                  <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
+                    join postsy
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
           
