@@ -12,15 +12,6 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-900 mb-4">product</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li><a href="#" className="hover:text-gray-800">features</a></li>
-              <li><a href="#" className="hover:text-gray-800">pricing</a></li>
-              <li><a href="#" className="hover:text-gray-800">mobile app</a></li>
-            </ul>
-          </div>
-          
-          <div>
             <h4 className="font-medium text-gray-900 mb-4">company</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li><a href="#" className="hover:text-gray-800">about</a></li>
