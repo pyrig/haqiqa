@@ -63,16 +63,17 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-white">
-        <div className="text-2xl font-bold" style={{ color: '#8B4B8C' }}>
+    <div className="min-h-screen bg-white font-sans">
+      {/* Top Header */}
+      <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+        <div className="text-2xl font-bold text-purple-900">
           cohost
         </div>
-        <div className="flex items-center gap-4">
+        
+        <div className="flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 text-gray-700 hover:bg-gray-100">
+              <Button variant="ghost" className="flex items-center gap-1 text-gray-700 hover:bg-gray-100 px-3 py-1 h-auto">
                 jordanwminor
                 <ChevronDown className="w-4 h-4" />
               </Button>
@@ -85,14 +86,14 @@ const Dashboard = () => {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                Sign out
+                sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
           <Dialog open={isPostDialogOpen} onOpenChange={setIsPostDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gray-800 hover:bg-gray-900 text-white px-6">
+              <Button className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-1 h-auto text-sm">
                 post
               </Button>
             </DialogTrigger>
@@ -106,80 +107,86 @@ const Dashboard = () => {
             </DialogContent>
           </Dialog>
 
-          <Button 
-            variant="ghost" 
-            className="text-gray-700 hover:bg-gray-100"
-            onClick={handleLogout}
-          >
+          <span className="text-gray-700 text-sm cursor-pointer hover:text-gray-900" onClick={handleLogout}>
             sign out
-          </Button>
+          </span>
         </div>
       </header>
 
       <div className="flex">
         {/* Left Sidebar */}
-        <div className="w-96 p-6 bg-white">
-          {/* Profile Card */}
-          <div className="rounded-lg p-6 text-white mb-4" style={{ backgroundColor: '#8B4B8C' }}>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full mb-4 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
-                  alt="Jordan Minor"
-                  className="w-full h-full object-cover"
-                />
+        <div className="w-80 bg-white">
+          <div className="p-4">
+            {/* Profile Card */}
+            <div className="rounded-lg overflow-hidden mb-4" style={{ backgroundColor: '#8B4B8C' }}>
+              <div className="p-6 text-white text-center">
+                <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20">
+                  <img 
+                    src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
+                    alt="Jordan Minor"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                <h2 className="text-xl font-bold mb-1">
+                  Jordan Minor
+                </h2>
+                
+                <p className="text-purple-200 text-sm mb-2">
+                  @jordanwminor
+                </p>
+                
+                <div className="flex items-center justify-center gap-1 text-purple-200 text-sm mb-2">
+                  <span>👤</span>
+                  <span>he/him</span>
+                </div>
+                
+                <p className="text-purple-200 text-sm mb-6">
+                  video game words
+                </p>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-full font-medium"
+                >
+                  Edit profile
+                </Button>
               </div>
-              
-              <h2 className="text-xl font-bold mb-1">
-                Jordan Minor
-              </h2>
-              
-              <p className="text-purple-200 text-sm mb-2">
-                @jordanwminor
-              </p>
-              
-              <div className="flex items-center gap-1 text-purple-200 text-sm mb-2">
-                <span>👤</span>
-                <span>he/him</span>
-              </div>
-              
-              <p className="text-purple-200 text-sm mb-6">
-                video game words
-              </p>
-              
-              <Button 
-                variant="outline" 
-                className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-full"
-                onClick={() => navigate('/profile')}
-              >
-                Edit profile
-              </Button>
             </div>
+            
+            {/* Report Bug Button */}
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2 rounded-full font-medium py-2"
+              style={{ 
+                backgroundColor: '#FCE7F3', 
+                borderColor: '#F9A8D4', 
+                color: '#BE185D' 
+              }}
+            >
+              <Bug className="w-4 h-4" />
+              report a bug
+            </Button>
           </div>
-          
-          {/* Report Bug Button */}
-          <Button 
-            variant="outline" 
-            className="w-full flex items-center justify-center gap-2 text-pink-600 border-pink-200 hover:bg-pink-50 rounded-full"
-            style={{ backgroundColor: '#FCE7F3', borderColor: '#F9A8D4' }}
-          >
-            <Bug className="w-4 h-4" />
-            report a bug
-          </Button>
         </div>
 
         {/* Main Content */}
         <div className="flex-1 bg-white">
-          {/* Header Image */}
-          <div className="h-48 bg-gradient-to-r from-gray-300 to-gray-500 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-400 to-gray-600"></div>
+          {/* Header Banner */}
+          <div className="h-52 relative overflow-hidden">
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 50%, #374151 100%)'
+              }}
+            />
           </div>
 
-          {/* Filter Buttons */}
-          <div className="p-4 flex gap-2 border-b">
+          {/* Filter Bar */}
+          <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
             <Button 
               size="sm"
-              className="text-white rounded-none px-4"
+              className="text-white px-3 py-1 h-auto text-sm font-medium"
               style={{ backgroundColor: '#8B4B8C' }}
             >
               show shares
@@ -187,13 +194,13 @@ const Dashboard = () => {
             <Button 
               variant="outline"
               size="sm"
-              className="text-gray-600 border-gray-300 rounded-none px-4"
+              className="text-gray-600 border-gray-300 px-3 py-1 h-auto text-sm"
             >
               hide shares
             </Button>
             <Button 
               size="sm"
-              className="text-white rounded-none px-4"
+              className="text-white px-3 py-1 h-auto text-sm font-medium"
               style={{ backgroundColor: '#8B4B8C' }}
             >
               show replies
@@ -201,72 +208,74 @@ const Dashboard = () => {
             <Button 
               variant="outline"
               size="sm"
-              className="text-gray-600 border-gray-300 rounded-none px-4"
+              className="text-gray-600 border-gray-300 px-3 py-1 h-auto text-sm"
             >
               hide replies
             </Button>
           </div>
 
-          {/* Posts */}
-          <div>
-            {/* First Post */}
-            <div className="p-6 border-b">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden">
+          {/* Posts Feed */}
+          <div className="bg-white">
+            {/* First Post with Repost */}
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                   <img 
                     src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
                     alt="Jordan Minor"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-sm">
                     <span className="font-bold text-black">Jordan Minor</span>
                     <span className="text-gray-500">@jordanwminor</span>
                     <span className="text-gray-500">·</span>
-                    <span className="text-gray-500 text-sm">18 days ago</span>
-                    <Repeat className="w-4 h-4 text-gray-500 ml-auto" />
-                    <span className="font-bold text-black">Jordan Minor</span>
-                    <span className="text-gray-500">@jordanwminor</span>
-                    <MoreHorizontal className="w-4 h-4 text-gray-500 ml-4" />
+                    <span className="text-gray-500">18 days ago</span>
+                    <div className="flex items-center gap-2 ml-auto">
+                      <Repeat className="w-4 h-4 text-gray-500" />
+                      <span className="font-bold text-black">Jordan Minor</span>
+                      <span className="text-gray-500">@jordanwminor</span>
+                      <MoreHorizontal className="w-5 h-5 text-gray-400 ml-2" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Second Post */}
-            <div className="p-6 border-b">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                   <img 
                     src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
                     alt="Jordan Minor"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-sm mb-3">
                     <span className="font-bold text-black">Jordan Minor</span>
                     <span className="text-gray-500">@jordanwminor</span>
                     <span className="text-gray-500">·</span>
-                    <span className="text-gray-500 text-sm">2 mo. ago</span>
-                    <MoreHorizontal className="w-4 h-4 text-gray-500 ml-auto" />
+                    <span className="text-gray-500">2 mo. ago</span>
+                    <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
                   </div>
                   
                   <div className="mb-4">
                     <h3 className="text-2xl font-bold mb-2 text-black">finally</h3>
-                    <p className="text-gray-800 mb-4">a new place to post</p>
+                    <p className="text-gray-800 mb-4 text-base">a new place to post</p>
                     <p className="text-gray-500 text-sm">0 comments</p>
                   </div>
 
-                  <div className="flex items-center gap-4 justify-end">
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                  <div className="flex items-center gap-3 justify-end">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
                       <Edit3 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
                       <Heart className="w-4 h-4" />
                     </Button>
                   </div>
@@ -275,34 +284,34 @@ const Dashboard = () => {
             </div>
 
             {/* Third Post */}
-            <div className="p-6">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden">
+            <div className="px-6 py-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                   <img 
                     src="/lovable-uploads/056ac43c-b047-494a-bad0-851616e96cd4.png"
                     alt="Jordan Minor"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-sm mb-3">
                     <span className="font-bold text-black">Jordan Minor</span>
                     <span className="text-gray-500">@jordanwminor</span>
                     <span className="text-gray-500">·</span>
-                    <span className="text-gray-500 text-sm">2 mo. ago</span>
-                    <MoreHorizontal className="w-4 h-4 text-gray-500 ml-auto" />
+                    <span className="text-gray-500">2 mo. ago</span>
+                    <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
                   </div>
                   
                   <div className="mb-4">
-                    <p className="text-gray-800 mb-4">in all honesty, i just want another place to talk about my book</p>
+                    <p className="text-gray-800 mb-4 text-base">in all honesty, i just want another place to talk about my book</p>
                     <p className="text-gray-500 text-sm">0 comments</p>
                   </div>
 
-                  <div className="flex items-center gap-4 justify-end">
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                  <div className="flex items-center gap-3 justify-end">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
                       <Repeat className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600 p-1">
                       <Heart className="w-4 h-4" />
                     </Button>
                   </div>
