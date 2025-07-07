@@ -82,16 +82,6 @@ const Login = () => {
       {/* Left Panel */}
       <div className="flex-1 bg-teal-500 text-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto">
-          <div className="mb-8">
-            <div className="flex justify-center mb-4">
-              <img 
-                src="/lovable-uploads/e5544cdd-35d2-4900-ab76-ba21c6c4bd85.png" 
-                alt="Postsy Logo" 
-                className="h-16"
-              />
-            </div>
-          </div>
-          
           <h2 className="text-2xl font-semibold mb-6 text-center">Welcome back!</h2>
           <p className="text-lg mb-12 text-center opacity-90 leading-relaxed">
             Sign in to continue your journey with us and reconnect with your community.

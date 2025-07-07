@@ -129,14 +129,6 @@ const SignUp = () => {
       {/* Left Panel */}
       <div className="flex-1 bg-teal-500 text-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto text-center">
-          <div className="mb-8">
-            <img 
-              src="/lovable-uploads/e5544cdd-35d2-4900-ab76-ba21c6c4bd85.png" 
-              alt="Postsy Logo" 
-              className="h-16 mx-auto mb-4"
-            />
-          </div>
-          
           <h2 className="text-2xl font-semibold mb-6">Join the conversation</h2>
           <p className="text-lg mb-12 opacity-90">
             Share your thoughts, discover amazing content, and connect with like-minded people.
