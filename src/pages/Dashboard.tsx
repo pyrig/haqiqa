@@ -1,33 +1,17 @@
 
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { 
-  Home, 
-  Compass, 
-  Bookmark, 
-  User, 
-  Settings, 
-  LogOut,
-  UserPlus
-} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useFollows } from "@/hooks/useFollows";
-import EnhancedPostComposer from "@/components/EnhancedPostComposer";
-import PostFeed from "@/components/PostFeed";
-import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
+import EnhancedPostComposer from "@/components/EnhancedPostComposer";
+import TabNavigation from "@/components/TabNavigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, loading, signOut, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   const { suggestedUsers, followUser, checkIfFollowing, isFollowing } = useFollows();
   const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
 
@@ -50,15 +34,6 @@ const Dashboard = () => {
       checkFollowingStatus();
     }
   }, [suggestedUsers, checkIfFollowing]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate("/");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
 
   const handleFollowUser = (userId: string) => {
     followUser(userId);
@@ -84,7 +59,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
       <header className="bg-teal-500 text-white px-6 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <div className="flex items-center gap-2">
             <img 
               src="/lovable-uploads/360ec68b-0e2d-45c9-a1e9-84aca66b0284.png" 
@@ -92,71 +67,15 @@ const Dashboard = () => {
               className="h-8"
             />
           </div>
-          <div className="flex-1 max-w-md mx-8">
-            <SearchBar />
-          </div>
-          <div></div>
         </div>
       </header>
 
       <div className="flex justify-center">
         <div className="flex max-w-6xl w-full">
-          {/* Left Sidebar */}
-          <div className="w-64 bg-white h-screen p-6 border-r">
-            <nav className="space-y-4">
-              <div className="flex items-center gap-3 text-teal-500 font-medium">
-                <Home className="w-5 h-5" />
-                <span>Home</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
-                <Compass className="w-5 h-5" />
-                <span>Discover</span>
-              </div>
-              <div 
-                className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer"
-                onClick={() => navigate('/bookmarks')}
-              >
-                <Bookmark className="w-5 h-5" />
-                <span>Bookmarks</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
-                <User className="w-5 h-5" />
-                <span>Profile</span>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 cursor-pointer">
-                    <Settings className="w-5 h-5" />
-                    <span>Settings</span>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </nav>
-
-            <div className="mt-12">
-              <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                <h3 className="font-medium text-gray-700 mb-2">Anonymous Mode</h3>
-                <p className="text-sm text-gray-600 mb-3">Post without linking to your profile</p>
-              </div>
-              <Button 
-                className="w-full bg-teal-500 hover:bg-teal-600 text-white"
-                onClick={() => document.querySelector('textarea')?.focus()}
-              >
-                New Post
-              </Button>
-            </div>
-          </div>
-
           {/* Main Content */}
-          <div className="flex-1 max-w-2xl p-6">
+          <div className="flex-1 max-w-4xl p-6">
             <EnhancedPostComposer />
-            <PostFeed />
+            <TabNavigation />
           </div>
 
           {/* Right Sidebar */}
@@ -196,68 +115,9 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
-
-            {/* Trending Tags */}
-            <div className="bg-white rounded-lg p-4 shadow-sm border">
-              <h3 className="font-medium text-gray-900 mb-4">Trending Tags</h3>
-              <div className="space-y-2">
-                <Badge variant="secondary" className="text-blue-600 bg-blue-50 mr-2 mb-2 cursor-pointer hover:opacity-80">#photography</Badge>
-                <Badge variant="secondary" className="text-purple-600 bg-purple-50 mr-2 mb-2 cursor-pointer hover:opacity-80">#design</Badge>
-                <Badge variant="secondary" className="text-green-600 bg-green-50 mr-2 mb-2 cursor-pointer hover:opacity-80">#technology</Badge>
-                <Badge variant="secondary" className="text-orange-600 bg-orange-50 mr-2 mb-2 cursor-pointer hover:opacity-80">#travel</Badge>
-                <Badge variant="secondary" className="text-red-600 bg-red-50 mr-2 mb-2 cursor-pointer hover:opacity-80">#food</Badge>
-                <Badge variant="secondary" className="text-teal-600 bg-teal-50 mr-2 mb-2 cursor-pointer hover:opacity-80">#music</Badge>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
-              </div>
-              <span className="font-medium">Postsy</span>
-              <span className="text-gray-500 text-sm ml-2">Posting, but better.</span>
-            </div>
-            
-            <div className="flex gap-8 text-sm">
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Platform</h4>
-                <div className="space-y-1 text-gray-600">
-                  <div>About</div>
-                  <div>Features</div>
-                  <div>Guidelines</div>
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Legal</h4>
-                <div className="space-y-1 text-gray-600">
-                  <div>Privacy</div>
-                  <div>Terms</div>
-                  <div>Cookies</div>
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Connect</h4>
-                <div className="space-y-1 text-gray-600">
-                  <div>Contact</div>
-                  <div>Twitter</div>
-                  <div>GitHub</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-center text-gray-500 text-sm mt-8">
-            © 2024 Postsy. All rights reserved.
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
