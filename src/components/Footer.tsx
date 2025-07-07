@@ -7,7 +7,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img 
-                src="/lovable-uploads/ff8494d2-a25a-46bf-b40c-0074b9f2e405.png" 
+                src="/lovable-uploads/068b0d3e-f95c-4d37-8fb2-afd82ad27de0.png" 
                 alt="Postsy Logo" 
                 className="h-8"
               />
