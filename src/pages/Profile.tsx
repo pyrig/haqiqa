@@ -280,7 +280,7 @@ const Profile = () => {
                 <div className="flex items-center gap-1">
                   <FileText className="w-4 h-4" />
                   <span className="font-medium">{postsCount}</span>
-                  <span className="text-gray-500">Posts</span>
+                  <span className="text-gray-500">Postsys</span>
                 </div>
                 <div className="flex items-center gap-1 cursor-pointer hover:underline">
                   <Users className="w-4 h-4" />
