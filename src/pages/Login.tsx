@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Eye, Home, Bell, Bookmark } from "lucide-react";
+import { Eye, Home, Bell, Bookmark, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Login = () => {
@@ -15,10 +15,13 @@ const Login = () => {
       <div className="flex-1 bg-teal-500 text-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto">
           <div className="mb-8">
-            <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <div className="w-8 h-8 bg-white rounded-full"></div>
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/lovable-uploads/26ce2a2c-f9cb-4f74-b1ca-3a48f1088384.png" 
+                alt="Postsy Logo" 
+                className="h-16"
+              />
             </div>
-            <h1 className="text-4xl font-bold text-center mb-2">Postsy</h1>
           </div>
           
           <h2 className="text-2xl font-semibold mb-6 text-center">Welcome back!</h2>
@@ -63,9 +66,18 @@ const Login = () => {
       {/* Right Panel */}
       <div className="flex-1 bg-white p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
-            <p className="text-gray-600">Welcome back! Please enter your credentials</p>
+          <div className="mb-8">
+            <Link 
+              to="/" 
+              className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Link>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
+              <p className="text-gray-600">Welcome back! Please enter your credentials</p>
+            </div>
           </div>
           
           <form className="space-y-6">
