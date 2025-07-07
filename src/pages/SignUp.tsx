@@ -178,6 +178,11 @@ const SignUp = () => {
           </Link>
           
           <div className="text-center mb-8">
+            <img 
+              src="/lovable-uploads/5270032c-fbf1-47bc-98b0-761f2772e2ec.png" 
+              alt="Postsy Logo" 
+              className="h-16 mx-auto mb-6"
+            />
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Create your account</h2>
             <p className="text-gray-600">Join thousands of creators sharing their stories</p>
           </div>
