@@ -26,17 +26,88 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import EnhancedPostComposer from "@/components/EnhancedPostComposer";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Profile {
+  id: string;
+  username: string;
+  display_name: string;
+  bio: string;
+  avatar_url: string;
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, signOut, isAuthenticated } = useAuth();
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate("/login");
     }
   }, [loading, isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return;
+        }
+
+        if (data) {
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  // Add focus event listener to refetch profile when returning to dashboard
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user) {
+        const fetchProfile = async () => {
+          try {
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', user.id)
+              .single();
+
+            if (error) {
+              console.error('Error fetching profile:', error);
+              return;
+            }
+
+            if (data) {
+              setProfile(data);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        };
+        fetchProfile();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -126,21 +197,21 @@ const Dashboard = () => {
               <div className="p-6 text-white text-center">
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20">
                   <Avatar className="w-full h-full">
-                    {user?.user_metadata?.avatar_url ? (
-                      <AvatarImage src={user.user_metadata.avatar_url} />
+                    {profile?.avatar_url ? (
+                      <AvatarImage src={profile.avatar_url} />
                     ) : null}
                     <AvatarFallback className="bg-teal-600 text-white text-2xl">
-                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
+                      {(profile?.display_name || profile?.username || user?.email || 'U').charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 
                 <h2 className="text-xl font-medium mb-1">
-                  {user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User'}
+                  {profile?.display_name || profile?.username || user?.email?.split('@')[0] || 'User'}
                 </h2>
                 
                 <p className="text-teal-100 text-sm mb-2">
-                  @{user?.email?.split('@')[0] || 'user'}
+                  @{profile?.username || user?.email?.split('@')[0] || 'user'}
                 </p>
                 
                 <div className="flex items-center justify-center gap-1 text-teal-100 text-sm mb-2">
@@ -149,7 +220,7 @@ const Dashboard = () => {
                 </div>
                 
                 <p className="text-teal-100 text-sm mb-6">
-                  sharing thoughts & creativity
+                  {profile?.bio || 'sharing thoughts & creativity'}
                 </p>
                 
                 <Button 
