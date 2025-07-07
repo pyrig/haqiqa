@@ -12,10 +12,10 @@ interface Post {
   created_at: string;
   user_id: string;
   profiles?: {
-    username: string;
-    display_name: string;
-    avatar_url: string;
-  };
+    username: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 interface CreatePostData {
@@ -36,7 +36,7 @@ export const usePosts = () => {
         .from('posts')
         .select(`
           *,
-          profiles:user_id (
+          profiles!posts_user_id_fkey (
             username,
             display_name,
             avatar_url

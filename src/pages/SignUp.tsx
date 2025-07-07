@@ -84,23 +84,14 @@ const SignUp = () => {
           </div>
           
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName" className="text-gray-700 font-medium">First Name</Label>
-                <Input 
-                  id="firstName" 
-                  type="text" 
-                  className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName" className="text-gray-700 font-medium">Last Name</Label>
-                <Input 
-                  id="lastName" 
-                  type="text" 
-                  className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                />
-              </div>
+            <div>
+              <Label htmlFor="name" className="text-gray-700 font-medium">Name</Label>
+              <Input 
+                id="name" 
+                type="text" 
+                className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                placeholder="Enter your name"
+              />
             </div>
             
             <div>
