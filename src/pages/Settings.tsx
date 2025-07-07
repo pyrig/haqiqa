@@ -26,6 +26,7 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
+  pronouns: string;
   avatar_url: string;
 }
 
@@ -73,7 +74,7 @@ const Settings = () => {
             display_name: data.display_name || '',
             email: user?.email || '',
             password: '',
-            pronouns: '', // Add pronouns field to profiles table if needed
+            pronouns: data.pronouns || '',
             bio: data.bio || ''
           });
         }
@@ -131,6 +132,7 @@ const Settings = () => {
         .from('profiles')
         .update({
           display_name: formData.display_name,
+          pronouns: formData.pronouns,
           bio: formData.bio,
           updated_at: new Date().toISOString()
         })
@@ -255,7 +257,7 @@ const Settings = () => {
               <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                 Dashboard
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <DropdownMenuItem onClick={() => navigate(`/profile/${profile?.username || user?.user_metadata?.username || user?.email?.split('@')[0]}`)}>
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout} className="text-red-600">

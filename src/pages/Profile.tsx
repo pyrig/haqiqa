@@ -15,6 +15,7 @@ interface Profile {
   display_name: string;
   full_name: string;
   bio: string;
+  pronouns: string;
   avatar_url: string;
   created_at: string;
   theme_color: string;
@@ -250,6 +251,9 @@ const Profile = () => {
                 <div>
                   <h2 className="text-xl font-bold">{profile.display_name || profile.username}</h2>
                   <p className="text-gray-500">@{profile.username}</p>
+                  {profile.pronouns && (
+                    <p className="text-gray-600 text-sm">👤 {profile.pronouns}</p>
+                  )}
                 </div>
                 {!isOwnProfile && (
                   <Button 
