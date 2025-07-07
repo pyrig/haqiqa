@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,10 +25,11 @@ const Dashboard = () => {
       <header className="bg-teal-500 text-white px-6 py-4">
         <div className="flex items-center justify-center">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-full"></div>
-            </div>
-            <span className="text-xl font-semibold">Postsy</span>
+            <img 
+              src="/lovable-uploads/360ec68b-0e2d-45c9-a1e9-84aca66b0284.png" 
+              alt="Postsy Logo" 
+              className="h-8"
+            />
           </div>
         </div>
       </header>
