@@ -5,7 +5,13 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-4 gap-8 mb-12">
           <div>
-            <h4 className="font-medium text-gray-900 mb-4">postsy</h4>
+            <div className="flex items-center gap-2 mb-4">
+              <img 
+                src="/lovable-uploads/ff8494d2-a25a-46bf-b40c-0074b9f2e405.png" 
+                alt="Postsy Logo" 
+                className="h-8"
+              />
+            </div>
             <p className="text-gray-600 text-sm">
               Authentic sharing for meaningful connections.
             </p>
