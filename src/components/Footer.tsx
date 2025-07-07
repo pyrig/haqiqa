@@ -40,7 +40,7 @@ const Footer = () => {
         </div>
         
         <div className="text-center text-gray-500 text-sm">
-          © 2025 Postsy. All rights reserved.
+          © 2025 Postsy, LLC.
         </div>
       </div>
     </footer>
