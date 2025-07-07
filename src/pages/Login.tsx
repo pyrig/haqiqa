@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,7 +85,7 @@ const Login = () => {
           <div className="mb-8">
             <div className="flex justify-center mb-4">
               <img 
-                src="/lovable-uploads/e2441b3b-802f-41c1-bfe7-d6736390bb4c.png" 
+                src="/lovable-uploads/d7498e3c-fb4d-4545-983d-bd8ce8f538bf.png" 
                 alt="Postsy Logo" 
                 className="h-16"
               />
