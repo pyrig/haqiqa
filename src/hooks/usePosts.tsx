@@ -37,14 +37,7 @@ export const usePosts = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles!posts_user_id_fkey (
-            username,
-            display_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -52,13 +45,25 @@ export const usePosts = () => {
         throw error;
       }
       
-      // Transform the data to match our Post interface
-      return (data || []).map(post => ({
-        ...post,
-        media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
-        hashtags: post.hashtags || [],
-        profiles: post.profiles || null
-      })) as Post[];
+      // Fetch profiles separately to avoid join issues
+      const postsWithProfiles = await Promise.all(
+        (data || []).map(async (post) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('username, display_name, avatar_url')
+            .eq('id', post.user_id)
+            .single();
+
+          return {
+            ...post,
+            media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
+            hashtags: post.hashtags || [],
+            profiles: profile || null
+          } as Post;
+        })
+      );
+
+      return postsWithProfiles;
     },
   });
 

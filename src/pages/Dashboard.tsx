@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -90,7 +89,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Navigation */}
       <header className="bg-teal-500 text-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -109,7 +107,6 @@ const Dashboard = () => {
 
       <div className="flex justify-center">
         <div className="flex max-w-6xl w-full">
-          {/* Left Sidebar */}
           <div className="w-64 bg-white h-screen p-6 border-r">
             <nav className="space-y-4">
               <div className="flex items-center gap-3 text-teal-500 font-medium">
@@ -174,14 +171,11 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="flex-1 max-w-2xl p-6">
             <PostFeed />
           </div>
 
-          {/* Right Sidebar */}
           <div className="w-80 p-6">
-            {/* Suggested Users */}
             <div className="bg-white rounded-lg p-4 mb-6 shadow-sm border">
               <h3 className="font-medium text-gray-900 mb-4">Suggested Users</h3>
               <div className="space-y-3">
@@ -217,7 +211,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Trending Tags */}
             <div className="bg-white rounded-lg p-4 shadow-sm border">
               <h3 className="font-medium text-gray-900 mb-4">Trending Tags</h3>
               <div className="space-y-2">
@@ -233,15 +226,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="bg-white border-t mt-12">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
-              </div>
-              <span className="font-medium">Postsy</span>
+              <img 
+                src="/lovable-uploads/b3e14d41-e258-4dd5-9a5f-3af170daae64.png" 
+                alt="Postsy Logo" 
+                className="h-8"
+              />
               <span className="text-gray-500 text-sm ml-2">Posting, but better.</span>
             </div>
             
@@ -274,7 +267,7 @@ const Dashboard = () => {
           </div>
           
           <div className="text-center text-gray-500 text-sm mt-8">
-            © 2024 Postsy. All rights reserved.
+            © 2025 Postsy. All rights reserved.
           </div>
         </div>
       </footer>

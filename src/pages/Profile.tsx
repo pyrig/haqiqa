@@ -68,14 +68,7 @@ const Profile = () => {
         // Fetch user's posts
         const { data: postsData, error: postsError } = await supabase
           .from('posts')
-          .select(`
-            *,
-            profiles!posts_user_id_fkey (
-              username,
-              display_name,
-              avatar_url
-            )
-          `)
+          .select('*')
           .eq('user_id', profileData.id)
           .eq('is_anonymous', false)
           .order('created_at', { ascending: false });
@@ -83,14 +76,26 @@ const Profile = () => {
         if (postsError) {
           console.error('Error fetching posts:', postsError);
         } else {
-          const transformedPosts = (postsData || []).map(post => ({
-            ...post,
-            media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
-            hashtags: post.hashtags || [],
-            profiles: post.profiles || null
-          })) as Post[];
-          setPosts(transformedPosts);
-          setPostsCount(transformedPosts.length);
+          // Fetch profile data for each post separately
+          const postsWithProfiles = await Promise.all(
+            (postsData || []).map(async (post) => {
+              const { data: postProfile } = await supabase
+                .from('profiles')
+                .select('username, display_name, avatar_url')
+                .eq('id', post.user_id)
+                .single();
+
+              return {
+                ...post,
+                media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
+                hashtags: post.hashtags || [],
+                profiles: postProfile || null
+              } as Post;
+            })
+          );
+          
+          setPosts(postsWithProfiles);
+          setPostsCount(postsWithProfiles.length);
         }
 
         // Fetch followers count
