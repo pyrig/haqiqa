@@ -37,7 +37,7 @@ export const usePosts = () => {
         .from('posts')
         .select(`
           *,
-          profiles (
+          profiles!inner (
             username,
             display_name,
             avatar_url
