@@ -86,7 +86,7 @@ const Login = () => {
           <div className="mb-8">
             <div className="flex justify-center mb-4">
               <img 
-                src="/lovable-uploads/26ce2a2c-f9cb-4f74-b1ca-3a48f1088384.png" 
+                src="/lovable-uploads/e2441b3b-802f-41c1-bfe7-d6736390bb4c.png" 
                 alt="Postsy Logo" 
                 className="h-16"
               />
