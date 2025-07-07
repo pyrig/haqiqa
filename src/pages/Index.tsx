@@ -31,8 +31,17 @@ const Index = () => {
                   }}
                 />
                 <Link to="/signup">
-                  <Button className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-lg text-base">
-                    join postsy
+                  <Button className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-8 py-3 text-base relative overflow-hidden"
+                    style={{
+                      borderRadius: '20px 15px 25px 10px',
+                      background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                      boxShadow: 'inset -3px -3px 0px rgba(0,0,0,0.1), inset 2px 2px 0px rgba(255,255,255,0.3)'
+                    }}>
+                    <span className="relative z-10">join postsy</span>
+                    {/* Cheese holes */}
+                    <div className="absolute top-1 right-3 w-2 h-2 bg-yellow-300 rounded-full opacity-70"></div>
+                    <div className="absolute bottom-2 left-4 w-1.5 h-1.5 bg-yellow-300 rounded-full opacity-60"></div>
+                    <div className="absolute top-3 left-2 w-1 h-1 bg-yellow-300 rounded-full opacity-50"></div>
                   </Button>
                 </Link>
               </div>
