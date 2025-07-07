@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle, Bookmark, Share, AlertTriangle, BookmarkCheck, Eye, EyeOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useBookmarks } from '@/hooks/useBookmarks';
+import { useNavigate } from 'react-router-dom';
 
 interface Post {
   id: string;
@@ -28,6 +28,7 @@ interface EnhancedPostCardProps {
 }
 
 const EnhancedPostCard = ({ post }: EnhancedPostCardProps) => {
+  const navigate = useNavigate();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showContent, setShowContent] = useState(!post.content_warning);
   const { addBookmark, removeBookmark, checkIfBookmarked, isBookmarking } = useBookmarks();
@@ -57,6 +58,12 @@ const EnhancedPostCard = ({ post }: EnhancedPostCardProps) => {
     } else {
       addBookmark(post.id);
       setIsBookmarked(true);
+    }
+  };
+
+  const handleProfileClick = () => {
+    if (!post.is_anonymous && post.profiles?.username) {
+      navigate(`/profile/${post.profiles.username}`);
     }
   };
 
@@ -95,19 +102,24 @@ const EnhancedPostCard = ({ post }: EnhancedPostCardProps) => {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border mb-6">
       <div className="flex items-center gap-3 mb-4">
-        <Avatar className="w-10 h-10">
-          {!post.is_anonymous && post.profiles?.avatar_url ? (
-            <AvatarImage src={post.profiles.avatar_url} />
-          ) : null}
-          <AvatarFallback className={post.is_anonymous ? "bg-gray-100 text-gray-600" : "bg-teal-100 text-teal-600"}>
-            {post.is_anonymous ? 'A' : displayName.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <div className="font-medium">{displayName}</div>
-          <div className="text-sm text-gray-500 flex items-center gap-1">
-            {username} {username && '•'} {timeAgo.replace('about ', '')}
-            {getPrivacyIcon()}
+        <div 
+          className={`flex items-center gap-3 ${!post.is_anonymous ? 'cursor-pointer hover:opacity-80' : ''}`}
+          onClick={handleProfileClick}
+        >
+          <Avatar className="w-10 h-10">
+            {!post.is_anonymous && post.profiles?.avatar_url ? (
+              <AvatarImage src={post.profiles.avatar_url} />
+            ) : null}
+            <AvatarFallback className={post.is_anonymous ? "bg-gray-100 text-gray-600" : "bg-teal-100 text-teal-600"}>
+              {post.is_anonymous ? 'A' : displayName.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <div className="font-medium">{displayName}</div>
+            <div className="text-sm text-gray-500 flex items-center gap-1">
+              {username} {username && '•'} {timeAgo.replace('about ', '')}
+              {getPrivacyIcon()}
+            </div>
           </div>
         </div>
       </div>
