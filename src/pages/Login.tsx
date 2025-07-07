@@ -134,7 +134,7 @@ const Login = () => {
             </Link>
             <div className="text-center">
               <img 
-                src="/lovable-uploads/970d7a3b-5e2a-40df-8452-29fa2ec359c9.png" 
+                src="/lovable-uploads/da19ff46-bcdf-4dca-b183-959ff0f48318.png" 
                 alt="Postsy Logo" 
                 className="h-16 mx-auto mb-6"
               />
