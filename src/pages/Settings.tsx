@@ -36,6 +36,7 @@ const Settings = () => {
   const [formData, setFormData] = useState({
     display_name: '',
     email: '',
+    password: '',
     pronouns: '',
     bio: ''
   });
@@ -68,6 +69,7 @@ const Settings = () => {
           setFormData({
             display_name: data.display_name || '',
             email: user?.email || '',
+            password: '',
             pronouns: '', // Add pronouns field to profiles table if needed
             bio: data.bio || ''
           });
@@ -98,8 +100,19 @@ const Settings = () => {
     try {
       // Update email if changed
       if (formData.email !== user.email) {
+        if (!formData.password) {
+          toast({
+            title: "Password required",
+            description: "Please enter your current password to change your email.",
+            variant: "destructive",
+          });
+          setIsSaving(false);
+          return;
+        }
+
         const { error: emailError } = await supabase.auth.updateUser({
-          email: formData.email
+          email: formData.email,
+          password: formData.password
         });
         
         if (emailError) throw emailError;
@@ -338,6 +351,24 @@ const Settings = () => {
                   className="max-w-md"
                 />
               </div>
+
+              {/* Password (only show when email changed) */}
+              {formData.email !== user?.email && (
+                <div>
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-900 mb-2 block">
+                    Current Password <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="max-w-md"
+                    placeholder="Enter your current password"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Required to confirm email change</p>
+                </div>
+              )}
 
               {/* Pronouns */}
               <div>
