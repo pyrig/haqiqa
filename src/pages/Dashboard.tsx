@@ -124,7 +124,7 @@ const Dashboard = () => {
                 onClick={() => setActiveView('discovery')}
               >
                 <Compass className="w-5 h-5" />
-                <span>Discovery</span>
+                <span>Discover</span>
               </div>
               <div 
                 className={`flex items-center gap-3 cursor-pointer ${activeView === 'bookmarks' ? 'text-teal-500 font-medium' : 'text-gray-600 hover:text-gray-800'}`}
