@@ -637,22 +637,28 @@ const Dashboard = () => {
 
   // Touch event handlers for pull-to-refresh
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartY(e.touches[0].clientY);
+    if (window.scrollY === 0) {
+      setTouchStartY(e.touches[0].clientY);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartY === 0) return;
+    
     const touchY = e.touches[0].clientY;
     const pullDistance = Math.max(0, touchY - touchStartY);
     
     // Only trigger pull-to-refresh if we're at the top of the page
     if (window.scrollY === 0 && pullDistance > 0) {
       e.preventDefault();
-      setPullDistance(Math.min(pullDistance, 80));
+      const maxPull = 120;
+      const easedDistance = Math.min(pullDistance * 0.5, maxPull);
+      setPullDistance(easedDistance);
     }
   };
 
   const handleTouchEnd = () => {
-    if (pullDistance > 50) {
+    if (pullDistance > 60) {
       handleRefresh();
     } else {
       setPullDistance(0);
@@ -920,13 +926,17 @@ const Dashboard = () => {
           {/* Pull to refresh indicator */}
           {pullDistance > 0 && (
             <div 
-              className="absolute top-0 left-0 right-0 flex items-center justify-center bg-teal-50 border-b border-teal-200 z-10 transition-all duration-200"
-              style={{ height: `${pullDistance}px` }}
+              className="absolute top-0 left-0 right-0 flex items-center justify-center bg-gradient-to-b from-teal-50 to-transparent border-b border-teal-200 z-10 transition-all duration-200 ease-out"
+              style={{ 
+                height: `${pullDistance}px`,
+                transform: `translateY(${pullDistance > 60 ? -5 : 0}px)`,
+                opacity: Math.min(pullDistance / 60, 1)
+              }}
             >
               <div className="flex items-center gap-2 text-teal-600">
-                <RefreshCw className={`w-4 h-4 ${pullDistance > 50 ? 'animate-spin' : ''}`} />
-                <span className="text-sm">
-                  {pullDistance > 50 ? 'Release to refresh' : 'Pull to refresh'}
+                <RefreshCw className={`w-5 h-5 transition-transform duration-200 ${pullDistance > 60 ? 'animate-spin scale-110' : 'rotate-45'}`} />
+                <span className="text-sm font-medium">
+                  {pullDistance > 60 ? 'Release to refresh' : 'Pull to refresh'}
                 </span>
               </div>
             </div>
