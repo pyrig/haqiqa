@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Post {
@@ -19,12 +19,25 @@ interface Post {
   } | null;
 }
 
+const POSTS_PER_PAGE = 10;
+
 export const useFeedPosts = () => {
-  const { data: posts = [], isLoading } = useQuery({
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ['feed-posts'],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) {
+        return {
+          posts: [],
+          hasMore: false,
+        };
+      }
 
       // First get followed user IDs
       const { data: follows, error: followsError } = await supabase
@@ -40,19 +53,25 @@ export const useFeedPosts = () => {
       const followedIds = follows?.map(f => f.following_id) || [];
       const allUserIds = [user.id, ...followedIds];
 
-      // Get posts from followed users and own posts
+      // Get posts from followed users and own posts with pagination
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
         .in('user_id', allUserIds)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(pageParam * POSTS_PER_PAGE, (pageParam + 1) * POSTS_PER_PAGE - 1);
 
       if (postsError) {
         console.error('Error fetching feed posts:', postsError);
         throw postsError;
       }
 
-      if (!postsData || postsData.length === 0) return [];
+      if (!postsData || postsData.length === 0) {
+        return {
+          posts: [],
+          hasMore: false,
+        };
+      }
 
       // Get all unique user IDs from posts
       const userIds = [...new Set(postsData.map(post => post.user_id))];
@@ -75,17 +94,32 @@ export const useFeedPosts = () => {
       });
 
       // Combine posts with profile data
-      return postsData.map(post => ({
+      const postsWithProfiles = postsData.map(post => ({
         ...post,
         media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
         hashtags: post.hashtags || [],
         profiles: profilesMap.get(post.user_id) || null
       } as Post));
+
+      return {
+        posts: postsWithProfiles,
+        hasMore: postsWithProfiles.length === POSTS_PER_PAGE,
+      };
     },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasMore ? allPages.length : undefined;
+    },
+    initialPageParam: 0,
   });
+
+  // Flatten all pages into a single array
+  const posts = data?.pages.flatMap(page => page.posts) || [];
 
   return {
     posts,
     isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
   };
 };

@@ -1,5 +1,5 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,17 +28,26 @@ interface CreatePostData {
   content_warning?: string;
 }
 
+const POSTS_PER_PAGE = 10;
+
 export const usePosts = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: posts = [], isLoading } = useQuery({
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ['posts'],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(pageParam * POSTS_PER_PAGE, (pageParam + 1) * POSTS_PER_PAGE - 1);
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -63,9 +72,19 @@ export const usePosts = () => {
         })
       );
 
-      return postsWithProfiles;
+      return {
+        posts: postsWithProfiles,
+        hasMore: postsWithProfiles.length === POSTS_PER_PAGE,
+      };
     },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasMore ? allPages.length : undefined;
+    },
+    initialPageParam: 0,
   });
+
+  // Flatten all pages into a single array
+  const posts = data?.pages.flatMap(page => page.posts) || [];
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: CreatePostData) => {
@@ -104,6 +123,9 @@ export const usePosts = () => {
   return {
     posts,
     isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
     createPost: createPostMutation.mutate,
     isCreating: createPostMutation.isPending,
   };

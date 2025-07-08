@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Post {
@@ -19,10 +19,18 @@ interface Post {
   } | null;
 }
 
+const POSTS_PER_PAGE = 10;
+
 export const useDiscoveryPosts = () => {
-  const { data: posts = [], isLoading } = useQuery({
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ['discovery-posts'],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       let excludeIds: string[] = [];
@@ -38,12 +46,13 @@ export const useDiscoveryPosts = () => {
         excludeIds = [user.id, ...followedIds];
       }
 
-      // Get public posts excluding own posts and posts from followed users
+      // Get public posts excluding own posts and posts from followed users with pagination
       let query = supabase
         .from('posts')
         .select('*')
         .eq('privacy_level', 'public')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(pageParam * POSTS_PER_PAGE, (pageParam + 1) * POSTS_PER_PAGE - 1);
 
       if (excludeIds.length > 0) {
         query = query.not('user_id', 'in', `(${excludeIds.join(',')})`);
@@ -56,7 +65,12 @@ export const useDiscoveryPosts = () => {
         throw postsError;
       }
 
-      if (!postsData || postsData.length === 0) return [];
+      if (!postsData || postsData.length === 0) {
+        return {
+          posts: [],
+          hasMore: false,
+        };
+      }
 
       // Get all unique user IDs from posts
       const userIds = [...new Set(postsData.map(post => post.user_id))];
@@ -79,17 +93,32 @@ export const useDiscoveryPosts = () => {
       });
 
       // Combine posts with profile data
-      return postsData.map(post => ({
+      const postsWithProfiles = postsData.map(post => ({
         ...post,
         media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
         hashtags: post.hashtags || [],
         profiles: profilesMap.get(post.user_id) || null
       } as Post));
+
+      return {
+        posts: postsWithProfiles,
+        hasMore: postsWithProfiles.length === POSTS_PER_PAGE,
+      };
     },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasMore ? allPages.length : undefined;
+    },
+    initialPageParam: 0,
   });
+
+  // Flatten all pages into a single array
+  const posts = data?.pages.flatMap(page => page.posts) || [];
 
   return {
     posts,
     isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
   };
 };

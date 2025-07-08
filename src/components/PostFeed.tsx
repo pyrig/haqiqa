@@ -1,9 +1,16 @@
 
 import { usePosts } from '@/hooks/usePosts';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import EnhancedPostCard from './EnhancedPostCard';
 
 const PostFeed = () => {
-  const { posts, isLoading } = usePosts();
+  const { posts, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = usePosts();
+  
+  useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   if (isLoading) {
     return (
@@ -41,6 +48,17 @@ const PostFeed = () => {
       {posts.map((post) => (
         <EnhancedPostCard key={post.id} post={post} />
       ))}
+      {isFetchingNextPage && (
+        <div className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading more posts...</p>
+        </div>
+      )}
+      {!hasNextPage && posts.length > 0 && (
+        <div className="p-8 text-center">
+          <p className="text-muted-foreground">You've reached the end!</p>
+        </div>
+      )}
     </div>
   );
 };

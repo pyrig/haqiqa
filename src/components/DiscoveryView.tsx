@@ -1,9 +1,16 @@
 
 import { useDiscoveryPosts } from '@/hooks/useDiscoveryPosts';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import FeedPostCard from './FeedPostCard';
 
 const DiscoveryView = () => {
-  const { posts, isLoading } = useDiscoveryPosts();
+  const { posts, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useDiscoveryPosts();
+  
+  useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   if (isLoading) {
     return (
@@ -41,6 +48,17 @@ const DiscoveryView = () => {
       {posts.map((post) => (
         <FeedPostCard key={post.id} post={post} />
       ))}
+      {isFetchingNextPage && (
+        <div className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading more posts...</p>
+        </div>
+      )}
+      {!hasNextPage && posts.length > 0 && (
+        <div className="p-8 text-center">
+          <p className="text-muted-foreground">You've reached the end!</p>
+        </div>
+      )}
     </div>
   );
 };
