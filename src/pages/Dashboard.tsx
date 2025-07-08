@@ -769,11 +769,6 @@ const Dashboard = () => {
                   @{profile?.username || user?.email?.split('@')[0] || 'user'}
                 </p>
                 
-                <div className="flex items-center justify-center gap-1 text-teal-100 text-sm mb-2">
-                  <span>👤</span>
-                  <span>they/them</span>
-                </div>
-                
                 <p className="text-teal-100 text-sm mb-6">
                   {profile?.bio || 'sharing thoughts & creativity'}
                 </p>
