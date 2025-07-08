@@ -1,9 +1,12 @@
 
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, RotateCcw, Share } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import Replies from './Replies';
+import { useReplies } from '@/hooks/useReplies';
 
 interface Post {
   id: string;
@@ -23,6 +26,8 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
+  const [showReplies, setShowReplies] = useState(false);
+  const { replies } = useReplies(post.id);
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   
   const displayName = post.is_anonymous 
@@ -92,9 +97,14 @@ const PostCard = ({ post }: PostCardProps) => {
       )}
       
       <div className="flex items-center gap-4 text-gray-500">
-        <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-gray-700">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center gap-1 hover:text-gray-700"
+          onClick={() => setShowReplies(!showReplies)}
+        >
           <MessageCircle className="w-4 h-4" />
-          <span className="text-sm">Reply</span>
+          <span className="text-sm">Reply ({replies.length})</span>
         </Button>
         <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-gray-700">
           <RotateCcw className="w-4 h-4" />
@@ -105,6 +115,12 @@ const PostCard = ({ post }: PostCardProps) => {
           <span className="text-sm">Share</span>
         </Button>
       </div>
+
+      <Replies 
+        postId={post.id} 
+        isOpen={showReplies} 
+        onToggle={() => setShowReplies(!showReplies)} 
+      />
     </div>
   );
 };
