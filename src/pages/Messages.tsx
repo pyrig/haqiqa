@@ -121,7 +121,7 @@ const Messages = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-teal-100 to-teal-200 font-sans">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center gap-4">
@@ -142,79 +142,98 @@ const Messages = () => {
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto p-4">
-        <div className="bg-white rounded-lg shadow-sm border">
-          {/* Messages Header */}
-          <div className="p-4 border-b border-gray-200">
-            <h1 className="text-xl font-semibold text-gray-900 mb-4">Messages</h1>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input 
-                placeholder="Search conversations..." 
-                className="pl-10"
-              />
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Sidebar */}
+        <div className="hidden lg:block lg:w-80 bg-white">
+          <div className="p-4">
+            <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
+              <div className="p-6 text-white text-center">
+                <h2 className="text-xl font-medium mb-2">Messages</h2>
+                <p className="text-teal-100 text-sm">
+                  Stay connected with your conversations
+                </p>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Conversations List */}
-          <div className="divide-y divide-gray-200">
-            {conversations.length > 0 ? (
-              conversations.map((conversation) => (
-                <div 
-                  key={conversation.id} 
-                  className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                  onClick={() => {
-                    // TODO: Navigate to individual conversation
-                    console.log('Open conversation:', conversation.id);
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-12 h-12">
-                      {conversation.other_participant?.avatar_url ? (
-                        <AvatarImage src={conversation.other_participant.avatar_url} />
-                      ) : null}
-                      <AvatarFallback className="bg-teal-100 text-teal-600">
-                        {(conversation.other_participant?.display_name || conversation.other_participant?.username || 'U').charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+        {/* Main Content */}
+        <div className="flex-1 bg-white lg:ml-0">
+          <div className="p-4">
+            <div className="lg:hidden mb-4">
+              <h1 className="text-xl font-semibold text-gray-900 mb-2">Messages</h1>
+            </div>
+            
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input 
+                  placeholder="Search conversations..." 
+                  className="pl-10 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                />
+              </div>
+            </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-medium text-gray-900 truncate">
-                          {conversation.other_participant?.display_name || conversation.other_participant?.username}
-                        </h3>
-                        {conversation.last_message && (
-                          <span className="text-xs text-gray-500">
-                            {new Date(conversation.last_message.created_at).toLocaleDateString()}
-                          </span>
-                        )}
+            {/* Conversations List */}
+            <div className="space-y-3">
+              {conversations.length > 0 ? (
+                conversations.map((conversation) => (
+                  <div 
+                    key={conversation.id} 
+                    className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer hover:border-teal-300"
+                    onClick={() => {
+                      // TODO: Navigate to individual conversation
+                      console.log('Open conversation:', conversation.id);
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-12 h-12">
+                        {conversation.other_participant?.avatar_url ? (
+                          <AvatarImage src={conversation.other_participant.avatar_url} />
+                        ) : null}
+                        <AvatarFallback className="bg-teal-100 text-teal-600">
+                          {(conversation.other_participant?.display_name || conversation.other_participant?.username || 'U').charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-medium text-gray-900 truncate">
+                            {conversation.other_participant?.display_name || conversation.other_participant?.username}
+                          </h3>
+                          {conversation.last_message && (
+                            <span className="text-xs text-gray-500">
+                              {new Date(conversation.last_message.created_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 truncate">
+                          {conversation.last_message ? (
+                            <>
+                              {conversation.last_message.sender_id === user?.id ? 'You: ' : ''}
+                              {conversation.last_message.content}
+                            </>
+                          ) : (
+                            'No messages yet'
+                          )}
+                        </p>
                       </div>
-                      
-                      <p className="text-sm text-gray-600 truncate">
-                        {conversation.last_message ? (
-                          <>
-                            {conversation.last_message.sender_id === user?.id ? 'You: ' : ''}
-                            {conversation.last_message.content}
-                          </>
-                        ) : (
-                          'No messages yet'
-                        )}
-                      </p>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 text-center">
+                  <div className="text-teal-300 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+                  <p className="text-gray-600">Start a conversation by messaging someone from their profile!</p>
                 </div>
-              ))
-            ) : (
-              <div className="p-8 text-center">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
-                <p className="text-gray-500">Start a conversation by messaging someone from their profile!</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
