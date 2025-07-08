@@ -30,6 +30,7 @@ import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 
 interface Profile {
   id: string;
@@ -67,6 +68,25 @@ const Dashboard = () => {
   const [touchStartY, setTouchStartY] = useState(0);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isPostViewOpen, setIsPostViewOpen] = useState(false);
+
+  // Format time like Twitter (e.g., "1h", "5m", "2d")
+  const formatTwitterTime = (date: string) => {
+    const now = new Date();
+    const postDate = new Date(date);
+    const diffInSeconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}s`;
+    } else if (diffInSeconds < 3600) {
+      return `${Math.floor(diffInSeconds / 60)}m`;
+    } else if (diffInSeconds < 86400) {
+      return `${Math.floor(diffInSeconds / 3600)}h`;
+    } else if (diffInSeconds < 2592000) {
+      return `${Math.floor(diffInSeconds / 86400)}d`;
+    } else {
+      return postDate.toLocaleDateString();
+    }
+  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -820,7 +840,7 @@ const Dashboard = () => {
                         </span>
                         <span className="text-gray-500">·</span>
                         <span className="text-gray-500">
-                          {new Date(post.created_at).toLocaleDateString()}
+                          {formatTwitterTime(post.created_at)}
                         </span>
                         <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
                       </div>
@@ -932,7 +952,7 @@ const Dashboard = () => {
                     </span>
                     <span className="text-gray-500">·</span>
                     <span className="text-gray-500">
-                      {new Date(selectedPost.created_at).toLocaleDateString()}
+                      {formatTwitterTime(selectedPost.created_at)}
                     </span>
                   </div>
                   
