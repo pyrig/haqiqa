@@ -127,7 +127,7 @@ const SearchBar = ({ onResultSelect, placeholder = "Search users and hashtags...
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="pl-10 pr-10"
+          className="pl-10 pr-10 rounded-full"
           onFocus={() => query.trim().length > 2 && setShowResults(true)}
           onBlur={() => setTimeout(() => setShowResults(false), 200)}
         />
