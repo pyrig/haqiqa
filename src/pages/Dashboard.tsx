@@ -164,7 +164,7 @@ const Dashboard = () => {
     if (!user) return;
     setPostsLoading(true);
     try {
-      // First get list of people user follows
+      // Get list of people user follows
       const { data: followsData, error: followsError } = await supabase
         .from('follows')
         .select('following_id')
@@ -172,16 +172,15 @@ const Dashboard = () => {
 
       if (followsError) throw followsError;
 
-      if (!followsData || followsData.length === 0) {
-        setPosts([]);
-        return;
-      }
+      // Create array of user IDs to fetch posts from (following + own posts)
+      const userIds = followsData ? followsData.map(f => f.following_id) : [];
+      userIds.push(user.id); // Add user's own ID
 
-      // Then get posts from those people
+      // Get posts from those people + user's own posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('id, content, created_at, user_id')
-        .in('user_id', followsData.map(f => f.following_id))
+        .in('user_id', userIds)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -203,6 +202,8 @@ const Dashboard = () => {
         }));
 
         setPosts(postsWithProfiles);
+      } else {
+        setPosts([]);
       }
     } catch (error) {
       console.error('Error fetching following posts:', error);
@@ -296,6 +297,26 @@ const Dashboard = () => {
       navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user?.id); // Extra safety check
+
+      if (error) throw error;
+
+      // Remove the post from local state
+      setPosts(posts.filter(post => post.id !== postId));
+      
+      // Update posts count
+      setPostsCount(prev => prev - 1);
+    } catch (error) {
+      console.error('Error deleting post:', error);
     }
   };
 
@@ -553,6 +574,17 @@ const Dashboard = () => {
                       </div>
 
                       <div className="flex items-center gap-3 justify-end">
+                        {/* Show delete button only for user's own posts */}
+                        {post.user_id === user?.id && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-gray-400 hover:text-red-500 p-1"
+                            onClick={() => handleDeletePost(post.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
                           <Repeat className="w-4 h-4" />
                         </Button>
