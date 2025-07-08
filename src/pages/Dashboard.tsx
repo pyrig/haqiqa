@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import EnhancedPostComposer from "@/components/EnhancedPostComposer";
 import SearchBar from "@/components/SearchBar";
+import ViewAllUsers from "@/components/ViewAllUsers";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -74,6 +75,9 @@ const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState('following');
   const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [showViewAllModal, setShowViewAllModal] = useState(false);
+  const [viewAllType, setViewAllType] = useState<'following' | 'followers' | 'all'>('all');
+  const [viewAllTitle, setViewAllTitle] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
@@ -624,6 +628,12 @@ const Dashboard = () => {
     }
   };
 
+  const openViewAllModal = (type: 'following' | 'followers' | 'all', title: string) => {
+    setViewAllType(type);
+    setViewAllTitle(title);
+    setShowViewAllModal(true);
+  };
+
   // Touch event handlers for pull-to-refresh
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStartY(e.touches[0].clientY);
@@ -780,7 +790,17 @@ const Dashboard = () => {
             
             {/* Following Section */}
             <div className="mb-4 bg-gray-50 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-3">Following</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-900">Following</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => openViewAllModal('following', 'People you follow')}
+                  className="text-teal-600 hover:text-teal-700 text-sm"
+                >
+                  View All
+                </Button>
+              </div>
               <div className="space-y-2">
                 {following.length > 0 ? (
                   following.map((user) => (
@@ -806,7 +826,17 @@ const Dashboard = () => {
 
             {/* Followers Section */}
             <div className="mb-4 bg-gray-50 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-3">Followers</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-900">Followers</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => openViewAllModal('followers', 'Your followers')}
+                  className="text-teal-600 hover:text-teal-700 text-sm"
+                >
+                  View All
+                </Button>
+              </div>
               <div className="space-y-2">
                 {followers.length > 0 ? (
                   followers.map((user) => (
@@ -834,6 +864,22 @@ const Dashboard = () => {
             <div className="mb-4 bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium text-gray-900 mb-2">Posts</h3>
               <p className="text-2xl font-bold text-teal-600">{postsCount}</p>
+            </div>
+
+            {/* Discover Users Section */}
+            <div className="mb-4 bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-900">Discover People</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => openViewAllModal('all', 'Discover new people')}
+                  className="text-teal-600 hover:text-teal-700 text-sm"
+                >
+                  View All
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600">Find and connect with new people</p>
             </div>
             
             {/* Report Bug Button */}
@@ -1162,6 +1208,14 @@ const Dashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* View All Users Modal */}
+      <ViewAllUsers
+        isOpen={showViewAllModal}
+        onClose={() => setShowViewAllModal(false)}
+        type={viewAllType}
+        title={viewAllTitle}
+      />
     </div>
   );
 };
