@@ -50,6 +50,14 @@ interface Post {
   reposts_count?: number;
   is_liked?: boolean;
   is_reposted?: boolean;
+  // For reposts
+  is_repost?: boolean;
+  reposted_by?: {
+    username: string;
+    display_name: string;
+    avatar_url?: string;
+  };
+  reposted_at?: string;
 }
 
 const Dashboard = () => {
@@ -256,7 +264,7 @@ const Dashboard = () => {
       const userIds = followsData ? followsData.map(f => f.following_id) : [];
       userIds.push(user.id); // Add user's own ID
 
-      // Get posts from those people + user's own posts
+      // Get regular posts from those people + user's own posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('id, content, created_at, user_id')
@@ -266,17 +274,88 @@ const Dashboard = () => {
 
       if (postsError) throw postsError;
 
-      // Get profiles for post authors
+      // Get reposts from followed users
+      const { data: repostsData, error: repostsError } = await supabase
+        .from('reposts')
+        .select('post_id, user_id, created_at')
+        .in('user_id', userIds)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (repostsError) throw repostsError;
+
+      let allPosts = [];
+
+      // Process regular posts
       if (postsData && postsData.length > 0) {
+        allPosts = postsData.map(post => ({
+          ...post,
+          is_repost: false
+        }));
+      }
+
+      // Process reposts
+      if (repostsData && repostsData.length > 0) {
+        // Get the original posts for reposts
+        const repostedPostIds = repostsData.map(r => r.post_id);
+        const { data: originalPosts, error: originalPostsError } = await supabase
+          .from('posts')
+          .select('id, content, created_at, user_id')
+          .in('id', repostedPostIds);
+
+        if (originalPostsError) throw originalPostsError;
+
+        // Get profiles for users who reposted
+        const reposterIds = repostsData.map(r => r.user_id);
+        const { data: reposterProfiles, error: reposterError } = await supabase
+          .from('profiles')
+          .select('id, username, display_name, avatar_url')
+          .in('id', reposterIds);
+
+        if (reposterError) throw reposterError;
+
+        // Combine repost data with original posts
+        const repostWithOriginal = repostsData.map(repost => {
+          const originalPost = originalPosts?.find(p => p.id === repost.post_id);
+          const reposterProfile = reposterProfiles?.find(p => p.id === repost.user_id);
+          
+          if (originalPost && reposterProfile) {
+            return {
+              ...originalPost,
+              is_repost: true,
+              reposted_by: {
+                username: reposterProfile.username,
+                display_name: reposterProfile.display_name,
+                avatar_url: reposterProfile.avatar_url
+              },
+              reposted_at: repost.created_at,
+              // Use repost time for sorting
+              created_at: repost.created_at
+            };
+          }
+          return null;
+        }).filter(Boolean);
+
+        allPosts = [...allPosts, ...repostWithOriginal];
+      }
+
+      // Sort all posts by created_at (which is repost time for reposts)
+      allPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      // Get all unique user IDs from original posts
+      const allUserIds = [...new Set(allPosts.map(p => p.user_id))];
+      
+      // Get profiles for post authors
+      if (allUserIds.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id, username, display_name, avatar_url, bio')
-          .in('id', postsData.map(p => p.user_id));
+          .in('id', allUserIds);
 
         if (profilesError) throw profilesError;
 
         // Combine posts with profiles
-        const postsWithProfiles = postsData.map(post => ({
+        const postsWithProfiles = allPosts.map(post => ({
           ...post,
           profiles: profilesData?.find(p => p.id === post.user_id)
         }));
@@ -810,6 +889,22 @@ const Dashboard = () => {
             ) : posts.length > 0 ? (
               posts.map((post, index) => (
                 <div key={post.id} className={`px-6 py-4 ${index < posts.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                  {/* Repost indicator */}
+                  {post.is_repost && post.reposted_by && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                      <Repeat className="w-4 h-4" />
+                      <span>
+                        Reposted by{' '}
+                        <span 
+                          className="cursor-pointer hover:text-teal-600 font-medium"
+                          onClick={() => handleUserProfileClick(post.reposted_by?.username || 'user')}
+                        >
+                          {post.reposted_by.display_name || post.reposted_by.username}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                  
                   <div className="flex items-start gap-3">
                     <div 
                       className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 cursor-pointer hover:opacity-80"
