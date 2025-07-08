@@ -243,13 +243,6 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="flex-1 bg-white">
-          {/* Header Banner */}
-          <div className="h-52 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
-            <div className="absolute top-0 right-0 w-20 h-20 bg-teal-100 rounded-full opacity-50"></div>
-            <div className="absolute bottom-10 left-10 w-12 h-12 bg-teal-200 rounded-full opacity-60"></div>
-            <div className="absolute top-20 left-0 w-8 h-8 bg-teal-300 rounded-full opacity-40"></div>
-          </div>
 
           {/* Filter Bar */}
           <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
@@ -257,7 +250,7 @@ const Dashboard = () => {
               size="sm"
               className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
             >
-              show shares
+              following
             </Button>
             <Button 
               variant="outline"
@@ -270,7 +263,7 @@ const Dashboard = () => {
               size="sm"
               className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
             >
-              show replies
+              All Postsy
             </Button>
             <Button 
               variant="outline"
