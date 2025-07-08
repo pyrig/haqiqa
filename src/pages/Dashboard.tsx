@@ -234,9 +234,6 @@ const Dashboard = () => {
               <DropdownMenuItem onClick={() => navigate(`/profile/${profile?.username || user?.user_metadata?.username || user?.email?.split('@')[0]}`)}>
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/settings')}>
-                Settings
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
