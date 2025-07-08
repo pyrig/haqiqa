@@ -13,6 +13,7 @@ interface Profile {
   display_name: string;
   bio: string;
   avatar_url: string;
+  banner_url?: string;
   created_at: string;
 }
 
@@ -312,10 +313,25 @@ const Profile = () => {
         {/* Left Sidebar */}
         <div className="w-80 bg-white">
           <div className="p-4">
-            {/* Profile Card */}
-            <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
-              <div className="p-6 text-white text-center">
-                <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20">
+            {/* Profile Card with Banner */}
+            <div className="rounded-lg overflow-hidden mb-4">
+              {/* Banner */}
+              {profile.banner_url ? (
+                <div className="h-24 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400 relative">
+                  <img 
+                    src={profile.banner_url} 
+                    alt="Profile banner" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-24 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
+              )}
+              
+              {/* Profile Content */}
+              <div className="bg-teal-500 p-6 text-white text-center relative">
+                {/* Avatar positioned to overlap banner */}
+                <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20 -mt-10 relative z-10 bg-teal-500">
                   <Avatar className="w-full h-full">
                     {profile.avatar_url ? (
                       <AvatarImage src={profile.avatar_url} />

@@ -29,7 +29,7 @@ interface ProfileFormProps {
   user: User | null;
   formData: FormData;
   setFormData: (data: FormData) => void;
-  setProfile: (profile: Profile | null) => void;
+  setProfile: (updateFn: (prev: Profile | null) => Profile | null) => void;
   isSaving: boolean;
   onSave: () => void;
   onCancel: () => void;
@@ -64,7 +64,7 @@ const ProfileForm = ({
               userId={user?.id || ''}
               displayName={profile?.display_name || user?.email?.split('@')[0]}
               onAvatarUpdate={(newAvatarUrl) => {
-                setProfile(prev => prev ? { ...prev, avatar_url: newAvatarUrl } : null);
+                setProfile(prev => prev ? { ...prev, avatar_url: newAvatarUrl } : prev);
               }}
             />
           </div>
@@ -76,7 +76,7 @@ const ProfileForm = ({
               currentBannerUrl={profile?.banner_url}
               userId={user?.id || ''}
               onBannerUpdate={(newBannerUrl) => {
-                setProfile(prev => prev ? { ...prev, banner_url: newBannerUrl } : null);
+                setProfile(prev => prev ? { ...prev, banner_url: newBannerUrl } : prev);
               }}
             />
           </div>
