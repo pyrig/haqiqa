@@ -29,6 +29,7 @@ import EnhancedPostComposer from "@/components/EnhancedPostComposer";
 import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 interface Profile {
   id: string;
@@ -60,6 +61,8 @@ const Dashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isPostViewOpen, setIsPostViewOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -322,6 +325,17 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error deleting post:', error);
     }
+  };
+
+  // Handle post click to enlarge
+  const handlePostClick = (post: Post) => {
+    setSelectedPost(post);
+    setIsPostViewOpen(true);
+  };
+
+  // Handle user profile click
+  const handleUserProfileClick = (username: string) => {
+    navigate(`/profile/${username}`);
   };
 
   // Refresh functions
@@ -640,7 +654,10 @@ const Dashboard = () => {
               posts.map((post, index) => (
                 <div key={post.id} className={`px-6 py-4 ${index < posts.length - 1 ? 'border-b border-gray-200' : ''}`}>
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                    <div 
+                      className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 cursor-pointer hover:opacity-80"
+                      onClick={() => handleUserProfileClick(post.profiles?.username || 'user')}
+                    >
                       <Avatar>
                         {post.profiles?.avatar_url ? (
                           <AvatarImage src={post.profiles.avatar_url} />
@@ -652,10 +669,16 @@ const Dashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 text-sm mb-3">
-                        <span className="font-medium text-gray-900">
+                        <span 
+                          className="font-medium text-gray-900 cursor-pointer hover:text-teal-600"
+                          onClick={() => handleUserProfileClick(post.profiles?.username || 'user')}
+                        >
                           {post.profiles?.display_name || post.profiles?.username || 'User'}
                         </span>
-                        <span className="text-gray-500">
+                        <span 
+                          className="text-gray-500 cursor-pointer hover:text-teal-600"
+                          onClick={() => handleUserProfileClick(post.profiles?.username || 'user')}
+                        >
                           @{post.profiles?.username || 'user'}
                         </span>
                         <span className="text-gray-500">·</span>
@@ -665,7 +688,10 @@ const Dashboard = () => {
                         <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
                       </div>
                       
-                      <div className="mb-4">
+                      <div 
+                        className="mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded-lg -ml-2 transition-colors"
+                        onClick={() => handlePostClick(post)}
+                      >
                         <p className="text-gray-800 mb-4 text-base">{post.content}</p>
                         <p className="text-gray-500 text-sm">0 comments</p>
                       </div>
@@ -705,6 +731,90 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Post View Dialog */}
+      <Dialog open={isPostViewOpen} onOpenChange={setIsPostViewOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Post Details</DialogTitle>
+          </DialogHeader>
+          {selectedPost && (
+            <div className="mt-4">
+              <div className="flex items-start gap-3">
+                <div 
+                  className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 cursor-pointer hover:opacity-80"
+                  onClick={() => {
+                    handleUserProfileClick(selectedPost.profiles?.username || 'user');
+                    setIsPostViewOpen(false);
+                  }}
+                >
+                  <Avatar className="w-full h-full">
+                    {selectedPost.profiles?.avatar_url ? (
+                      <AvatarImage src={selectedPost.profiles.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-100 text-teal-600">
+                      {(selectedPost.profiles?.display_name || selectedPost.profiles?.username || 'U').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-sm mb-3">
+                    <span 
+                      className="font-medium text-gray-900 cursor-pointer hover:text-teal-600"
+                      onClick={() => {
+                        handleUserProfileClick(selectedPost.profiles?.username || 'user');
+                        setIsPostViewOpen(false);
+                      }}
+                    >
+                      {selectedPost.profiles?.display_name || selectedPost.profiles?.username || 'User'}
+                    </span>
+                    <span 
+                      className="text-gray-500 cursor-pointer hover:text-teal-600"
+                      onClick={() => {
+                        handleUserProfileClick(selectedPost.profiles?.username || 'user');
+                        setIsPostViewOpen(false);
+                      }}
+                    >
+                      @{selectedPost.profiles?.username || 'user'}
+                    </span>
+                    <span className="text-gray-500">·</span>
+                    <span className="text-gray-500">
+                      {new Date(selectedPost.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <p className="text-gray-800 text-lg leading-relaxed">{selectedPost.content}</p>
+                  </div>
+
+                  <div className="flex items-center gap-3 justify-end">
+                    {/* Show delete button only for user's own posts */}
+                    {selectedPost.user_id === user?.id && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-400 hover:text-red-500 p-1"
+                        onClick={() => {
+                          handleDeletePost(selectedPost.id);
+                          setIsPostViewOpen(false);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
+                      <Repeat className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
