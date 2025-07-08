@@ -586,6 +586,15 @@ const Dashboard = () => {
           <div className="p-4 flex gap-2 bg-white border-b border-gray-200" style={{ marginTop: isRefreshing ? '40px' : '0' }}>
             <Button 
               size="sm"
+              variant="outline"
+              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-2 py-1 h-auto text-sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button 
+              size="sm"
               variant={activeFilter === 'following' ? 'default' : 'outline'}
               className={activeFilter === 'following' 
                 ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
