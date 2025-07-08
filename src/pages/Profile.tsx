@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, MoreHorizontal, Heart, Repeat, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import MessageButton from '@/components/MessageButton';
 
 interface Profile {
   id: string;
@@ -354,13 +355,21 @@ const Profile = () => {
                 <div className="mb-6"></div>
                 
                 {!isOwnProfile && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
-                    onClick={handleFollowToggle}
-                  >
-                    {isFollowing ? "Following" : "Follow"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
+                      onClick={handleFollowToggle}
+                    >
+                      {isFollowing ? "Following" : "Follow"}
+                    </Button>
+                    <div className="bg-white/10 rounded-lg p-2">
+                      <MessageButton
+                        recipientId={profile.id}
+                        recipientName={profile.display_name || profile.username}
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -426,17 +435,23 @@ const Profile = () => {
                   <p className="text-gray-500">@{profile.username}</p>
                 </div>
                 {!isOwnProfile && (
-                  <Button 
-                    variant={isFollowing ? "outline" : "default"}
-                    size="sm"
-                    className={isFollowing 
-                      ? "text-gray-600 border-gray-300" 
-                      : "bg-teal-500 hover:bg-teal-600 text-white"
-                    }
-                    onClick={handleFollowToggle}
-                  >
-                    {isFollowing ? 'Following' : 'Follow'}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={isFollowing ? "outline" : "default"}
+                      size="sm"
+                      className={isFollowing 
+                        ? "text-gray-600 border-gray-300" 
+                        : "bg-teal-500 hover:bg-teal-600 text-white"
+                      }
+                      onClick={handleFollowToggle}
+                    >
+                      {isFollowing ? 'Following' : 'Follow'}
+                    </Button>
+                    <MessageButton
+                      recipientId={profile.id}
+                      recipientName={profile.display_name || profile.username}
+                    />
+                  </div>
                 )}
               </div>
               

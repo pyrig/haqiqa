@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import ProfileCard from "@/components/settings/ProfileCard";
 import ProfileForm from "@/components/settings/ProfileForm";
 import DangerZone from "@/components/settings/DangerZone";
+import Messages from "@/components/Messages";
 
 interface Profile {
   id: string;
@@ -217,6 +218,14 @@ const Settings = () => {
           </Button>
         </div>
       </header>
+
+      {/* Messages Section */}
+      <div className="max-w-6xl mx-auto p-4 sm:p-6">
+        <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Messages</h2>
+          <Messages />
+        </div>
+      </div>
 
       <div className="flex flex-col lg:flex-row">
         {/* Left Sidebar - Hidden on mobile */}
