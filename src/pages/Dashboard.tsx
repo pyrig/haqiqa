@@ -25,6 +25,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import EnhancedPostComposer from "@/components/EnhancedPostComposer";
+import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -41,6 +42,9 @@ const Dashboard = () => {
   const { user, loading, signOut, isAuthenticated } = useAuth();
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [following, setFollowing] = useState<Profile[]>([]);
+  const [followers, setFollowers] = useState<Profile[]>([]);
+  const [postsCount, setPostsCount] = useState(0);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -74,8 +78,76 @@ const Dashboard = () => {
 
     if (user) {
       fetchProfile();
+      fetchFollowing();
+      fetchFollowers();
+      fetchPostsCount();
     }
   }, [user]);
+
+  const fetchFollowing = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', user.id)
+        .limit(5);
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, username, display_name, avatar_url, bio')
+          .in('id', data.map(f => f.following_id));
+        
+        if (profileError) throw profileError;
+        setFollowing(profiles || []);
+      }
+    } catch (error) {
+      console.error('Error fetching following:', error);
+    }
+  };
+
+  const fetchFollowers = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('follows')
+        .select('follower_id')
+        .eq('following_id', user.id)
+        .limit(5);
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, username, display_name, avatar_url, bio')
+          .in('id', data.map(f => f.follower_id));
+        
+        if (profileError) throw profileError;
+        setFollowers(profiles || []);
+      }
+    } catch (error) {
+      console.error('Error fetching followers:', error);
+    }
+  };
+
+  const fetchPostsCount = async () => {
+    if (!user) return;
+    try {
+      const { count, error } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setPostsCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching posts count:', error);
+    }
+  };
 
   // Add focus event listener to refetch profile when returning to dashboard
   useEffect(() => {
@@ -143,6 +215,11 @@ const Dashboard = () => {
             alt="Postsy Logo" 
             className="h-8"
           />
+        </div>
+        
+        {/* Search Bar */}
+        <div className="flex-1 max-w-md mx-4">
+          <SearchBar placeholder="Search users and hashtags..." />
         </div>
         
         <div className="flex items-center gap-3">
@@ -228,6 +305,64 @@ const Dashboard = () => {
                   Edit profile
                 </Button>
               </div>
+            </div>
+            
+            {/* Following Section */}
+            <div className="mb-4 bg-gray-50 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-3">Following</h3>
+              <div className="space-y-2">
+                {following.length > 0 ? (
+                  following.map((user) => (
+                    <div key={user.id} className="flex items-center gap-2">
+                      <Avatar className="w-6 h-6">
+                        {user.avatar_url ? (
+                          <AvatarImage src={user.avatar_url} />
+                        ) : null}
+                        <AvatarFallback className="bg-teal-100 text-teal-600 text-xs">
+                          {(user.display_name || user.username || 'U').charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-gray-700">
+                        {user.display_name || user.username}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No following yet</p>
+                )}
+              </div>
+            </div>
+
+            {/* Followers Section */}
+            <div className="mb-4 bg-gray-50 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-3">Followers</h3>
+              <div className="space-y-2">
+                {followers.length > 0 ? (
+                  followers.map((user) => (
+                    <div key={user.id} className="flex items-center gap-2">
+                      <Avatar className="w-6 h-6">
+                        {user.avatar_url ? (
+                          <AvatarImage src={user.avatar_url} />
+                        ) : null}
+                        <AvatarFallback className="bg-teal-100 text-teal-600 text-xs">
+                          {(user.display_name || user.username || 'U').charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-gray-700">
+                        {user.display_name || user.username}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No followers yet</p>
+                )}
+              </div>
+            </div>
+
+            {/* Posts Count Section */}
+            <div className="mb-4 bg-gray-50 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-2">Posts</h3>
+              <p className="text-2xl font-bold text-teal-600">{postsCount}</p>
             </div>
             
             {/* Report Bug Button */}
