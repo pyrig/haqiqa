@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageCircle, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -119,8 +119,10 @@ const MessageButton = ({ recipientId, recipientName }: MessageButtonProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4" />
+        <Button 
+          size="sm"
+          className="bg-teal-500 hover:bg-teal-600 text-white"
+        >
           Message
         </Button>
       </DialogTrigger>
