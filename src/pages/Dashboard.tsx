@@ -21,7 +21,8 @@ import {
   Bug,
   Repeat,
   MoreHorizontal,
-  RefreshCw
+  RefreshCw,
+  Share
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +32,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
   id: string;
@@ -63,6 +65,7 @@ interface Post {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, signOut, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [following, setFollowing] = useState<Profile[]>([]);
@@ -488,6 +491,35 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error toggling repost:', error);
+    }
+  };
+
+  // Handle share
+  const handleShare = async (postId: string) => {
+    try {
+      const postUrl = `${window.location.origin}/post/${postId}`;
+      
+      if (navigator.share) {
+        // Use native share API if available
+        await navigator.share({
+          title: 'Check out this post on Postsy',
+          url: postUrl,
+        });
+      } else {
+        // Fallback to copying to clipboard
+        await navigator.clipboard.writeText(postUrl);
+        toast({
+          title: "Link copied!",
+          description: "Post link has been copied to your clipboard.",
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to share the post. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -974,6 +1006,14 @@ const Dashboard = () => {
                         <Button 
                           variant="ghost" 
                           size="sm" 
+                          className="text-gray-400 hover:text-blue-500 p-1"
+                          onClick={() => handleShare(post.id)}
+                        >
+                          <Share className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
                           className={`p-1 flex items-center gap-1 ${post.is_liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                           onClick={() => handleLike(post.id)}
                         >
@@ -1080,6 +1120,14 @@ const Dashboard = () => {
                       {selectedPost.reposts_count > 0 && (
                         <span className="text-xs">{selectedPost.reposts_count}</span>
                       )}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-400 hover:text-blue-500 p-1"
+                      onClick={() => handleShare(selectedPost.id)}
+                    >
+                      <Share className="w-4 h-4" />
                     </Button>
                     <Button 
                       variant="ghost" 
