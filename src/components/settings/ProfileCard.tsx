@@ -21,7 +21,7 @@ const ProfileCard = ({ profile, userEmail }: ProfileCardProps) => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-80 bg-white">
+    <div className="hidden lg:block lg:w-80 bg-white">
       <div className="p-4">
         {/* Profile Card */}
         <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">

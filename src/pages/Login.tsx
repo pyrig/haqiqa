@@ -132,12 +132,12 @@ const Login = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Link>
-            <div className="text-center">
-              <img 
-                src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
-                alt="Postsy Logo" 
-                className="h-12 sm:h-16 mx-auto mb-4 sm:mb-6"
-              />
+        <div className="text-center">
+          <img 
+            src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
+            alt="Postsy Logo" 
+            className="h-8 sm:h-12 md:h-16 mx-auto mb-4 sm:mb-6"
+          />
             </div>
           </div>
 

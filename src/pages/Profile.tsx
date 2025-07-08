@@ -299,19 +299,19 @@ const Profile = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back
+            <span className="hidden sm:inline">Back</span>
           </Button>
           <img 
             src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
             alt="Postsy Logo" 
-            className="h-8"
+            className="h-6 sm:h-8"
           />
         </div>
       </header>
 
-      <div className="flex">
-        {/* Left Sidebar */}
-        <div className="w-80 bg-white">
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Sidebar - Hidden on mobile */}
+        <div className="hidden lg:block lg:w-80 bg-white">
           <div className="p-4">
             {/* Profile Card */}
             <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
@@ -377,27 +377,100 @@ const Profile = () => {
 
         {/* Main Content */}
         <div className="flex-1 bg-white">
-          {/* Banner */}
-          {profile.banner_url ? (
-            <div className="h-48 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400 relative">
-              <img 
-                src={profile.banner_url} 
-                alt="Profile banner" 
-                className="w-full h-full object-cover"
-              />
+          {/* Mobile Profile Header */}
+          <div className="lg:hidden">
+            {/* Banner */}
+            {profile.banner_url ? (
+              <div className="h-32 sm:h-40 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400 relative">
+                <img 
+                  src={profile.banner_url} 
+                  alt="Profile banner" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="h-32 sm:h-40 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
+            )}
+            
+            {/* Mobile Profile Info */}
+            <div className="px-4 py-4 relative">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white -mt-8 relative z-10 bg-white">
+                  <Avatar className="w-full h-full">
+                    {profile.avatar_url ? (
+                      <AvatarImage src={profile.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-100 text-teal-600 text-xl">
+                      {(profile.display_name || profile.username).charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="flex-1 pt-2">
+                  <h1 className="text-xl font-bold text-gray-900">
+                    {profile.display_name || profile.username}
+                  </h1>
+                  <p className="text-gray-500">@{profile.username}</p>
+                </div>
+                {!isOwnProfile && (
+                  <Button 
+                    variant={isFollowing ? "outline" : "default"}
+                    size="sm"
+                    className={isFollowing 
+                      ? "text-gray-600 border-gray-300" 
+                      : "bg-teal-500 hover:bg-teal-600 text-white"
+                    }
+                    onClick={handleFollowToggle}
+                  >
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </Button>
+                )}
+              </div>
+              
+              <p className="text-gray-700 mb-4">
+                {profile.bio || 'No bio yet'}
+              </p>
+              
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="font-bold text-gray-900">{postsCount}</div>
+                  <div className="text-sm text-gray-500">Posts</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-gray-900">{followingCount}</div>
+                  <div className="text-sm text-gray-500">Following</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-gray-900">{followersCount}</div>
+                  <div className="text-sm text-gray-500">Followers</div>
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="h-48 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
-          )}
+          </div>
+
+          {/* Desktop Banner */}
+          <div className="hidden lg:block">
+            {/* Banner */}
+            {profile.banner_url ? (
+              <div className="h-48 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400 relative">
+                <img 
+                  src={profile.banner_url} 
+                  alt="Profile banner" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="h-48 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
+            )}
+          </div>
           
           {/* Filter Bar */}
-          <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
+          <div className="p-4 flex gap-2 bg-white border-b border-gray-200 overflow-x-auto">
             <Button 
               size="sm"
               variant={activeFilter === 'postsys' ? 'default' : 'outline'}
               className={activeFilter === 'postsys' 
-                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
-                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium whitespace-nowrap" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm whitespace-nowrap"
               }
               onClick={() => setActiveFilter('postsys')}
             >
@@ -407,8 +480,8 @@ const Profile = () => {
               size="sm"
               variant={activeFilter === 'replies' ? 'default' : 'outline'}
               className={activeFilter === 'replies' 
-                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
-                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium whitespace-nowrap" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm whitespace-nowrap"
               }
               onClick={() => setActiveFilter('replies')}
             >
@@ -426,7 +499,7 @@ const Profile = () => {
             ) : activeFilter === 'postsys' ? (
               posts.length > 0 ? (
                 posts.map((post, index) => (
-                  <div key={post.id} className={`px-6 py-4 ${index < posts.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                  <div key={post.id} className={`px-4 sm:px-6 py-4 ${index < posts.length - 1 ? 'border-b border-gray-200' : ''}`}>
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                         <Avatar>

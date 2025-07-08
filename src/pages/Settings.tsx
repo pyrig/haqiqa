@@ -180,20 +180,25 @@ const Settings = () => {
           <img 
             src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
             alt="Postsy Logo" 
-            className="h-8 cursor-pointer hover:opacity-80 transition-opacity"
+            className="h-6 sm:h-8 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/dashboard')}
           />
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-1 text-gray-700 hover:bg-gray-100 px-3 py-1 h-auto">
-                {profile?.display_name || profile?.username || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'user'}
+              <Button variant="ghost" className="flex items-center gap-1 text-gray-700 hover:bg-gray-100 px-2 sm:px-3 py-1 h-auto text-sm">
+                <span className="hidden sm:inline">
+                  {profile?.display_name || profile?.username || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'user'}
+                </span>
+                <span className="sm:hidden">
+                  {(profile?.display_name || profile?.username || user?.email?.split('@')[0] || 'user').charAt(0).toUpperCase()}
+                </span>
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 bg-white">
               <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                 Dashboard
               </DropdownMenuItem>
@@ -206,14 +211,15 @@ const Settings = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-1 h-auto text-sm">
-            post
+          <Button className="bg-teal-500 hover:bg-teal-600 text-white px-3 sm:px-4 py-1 h-auto text-sm">
+            <span className="hidden sm:inline">post</span>
+            <span className="sm:hidden">+</span>
           </Button>
         </div>
       </header>
 
-      <div className="flex">
-        {/* Left Sidebar */}
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Sidebar - Hidden on mobile */}
         <ProfileCard 
           profile={profile} 
           userEmail={user?.email} 

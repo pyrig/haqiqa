@@ -743,10 +743,10 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="flex">
-        {/* Left Sidebar */}
-        <div className="w-80 bg-white">
-          <div className="p-4">
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Sidebar - Hidden on mobile, shown as full width on tablet, side panel on desktop */}
+        <div className="lg:w-80 bg-white order-2 lg:order-1">
+          <div className="p-4 hidden lg:block">
             {/* Profile Card */}
             <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
               <div className="p-6 text-white text-center">
@@ -940,8 +940,8 @@ const Dashboard = () => {
               size="sm"
               variant={activeFilter === 'following' ? 'default' : 'outline'}
               className={activeFilter === 'following' 
-                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
-                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium whitespace-nowrap" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm whitespace-nowrap"
               }
               onClick={() => setActiveFilter('following')}
             >
@@ -1066,9 +1066,9 @@ const Dashboard = () => {
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="sm" 
-                          className="text-gray-400 hover:text-blue-500 p-1"
-                          onClick={() => handleShare(post.id)}
+                            size="sm" 
+                            className="text-gray-400 hover:text-blue-500 p-1 sm:p-2"
+                            onClick={() => handleShare(post.id)}
                         >
                           <Share className="w-4 h-4" />
                         </Button>
