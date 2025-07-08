@@ -104,7 +104,7 @@ const Login = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2 text-center">Notifications</h3>
               <p className="text-sm opacity-90 text-center">
-                See who liked, commented, or shared your posts while you were away
+                See who liked, replied to, or shared your posts while you were away
               </p>
             </div>
             

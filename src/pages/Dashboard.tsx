@@ -1053,7 +1053,7 @@ const Dashboard = () => {
                         onClick={() => handlePostClick(post)}
                       >
                         <p className="text-gray-800 mb-4 text-base">{post.content}</p>
-                        <p className="text-gray-500 text-sm">0 comments</p>
+                        <p className="text-gray-500 text-sm">0 replies</p>
                       </div>
 
                       <div className="flex items-center gap-3 justify-end">
