@@ -12,6 +12,7 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
+  website?: string;
   avatar_url: string;
   banner_url?: string;
   created_at: string;
@@ -335,9 +336,22 @@ const Profile = () => {
                   @{profile.username}
                 </p>
                 
-                <p className="text-teal-100 text-sm mb-6">
+                <p className="text-teal-100 text-sm mb-2">
                   {profile.bio || "No bio yet"}
                 </p>
+                
+                {profile.website && (
+                  <a 
+                    href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-teal-100 text-sm mb-4 inline-block hover:text-white underline"
+                  >
+                    🔗 {profile.website.replace(/^https?:\/\//, '')}
+                  </a>
+                )}
+                
+                <div className="mb-6"></div>
                 
                 {!isOwnProfile && (
                   <Button 
@@ -426,9 +440,20 @@ const Profile = () => {
                 )}
               </div>
               
-              <p className="text-gray-700 mb-4">
+              <p className="text-gray-700 mb-2">
                 {profile.bio || 'No bio yet'}
               </p>
+              
+              {profile.website && (
+                <a 
+                  href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-600 text-sm mb-4 inline-block hover:text-teal-700 underline"
+                >
+                  🔗 {profile.website.replace(/^https?:\/\//, '')}
+                </a>
+              )}
               
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="text-center">

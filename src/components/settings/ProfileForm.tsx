@@ -11,6 +11,7 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
+  website?: string;
   avatar_url: string;
   banner_url?: string;
 }
@@ -19,6 +20,7 @@ interface FormData {
   display_name: string;
   email: string;
   password: string;
+  website: string;
   bio: string;
 }
 
@@ -126,6 +128,21 @@ const ProfileForm = ({
               <p className="text-sm text-gray-500 mt-1">Required to confirm email change</p>
             </div>
           )}
+
+          {/* Website */}
+          <div>
+            <Label htmlFor="website" className="text-sm font-medium text-gray-900 mb-2 block">
+              Website
+            </Label>
+            <Input
+              id="website"
+              type="url"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              className="max-w-md"
+              placeholder="https://yourwebsite.com"
+            />
+          </div>
 
           {/* Bio */}
           <div>

@@ -8,6 +8,7 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
+  website?: string;
   avatar_url: string;
 }
 
@@ -44,13 +45,26 @@ const ProfileCard = ({ profile, userEmail }: ProfileCardProps) => {
               @{profile?.username || userEmail?.split('@')[0] || 'user'}
             </p>
             
-            <p className="text-teal-100 text-sm mb-6">
+            <p className="text-teal-100 text-sm mb-2">
               {profile?.bio || 'sharing thoughts & creativity'}
             </p>
             
+            {profile?.website && (
+              <a 
+                href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-teal-100 text-sm mb-4 inline-block hover:text-white underline"
+              >
+                🔗 {profile.website.replace(/^https?:\/\//, '')}
+              </a>
+            )}
+            
+            <div className="mb-6"></div>
+            
             <Button 
               variant="outline" 
-              className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
+              className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium mt-4"
               onClick={() => navigate(`/profile/${profile?.username || userEmail?.split('@')[0]}`)}
             >
               View profile

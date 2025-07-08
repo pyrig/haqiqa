@@ -40,6 +40,7 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
+  website?: string;
   avatar_url: string;
 }
 
@@ -155,7 +156,7 @@ const Dashboard = () => {
       if (data && data.length > 0) {
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
-          .select('id, username, display_name, avatar_url, bio')
+          .select('id, username, display_name, avatar_url, bio, website')
           .in('id', data.map(f => f.following_id));
         
         if (profileError) throw profileError;
@@ -180,7 +181,7 @@ const Dashboard = () => {
       if (data && data.length > 0) {
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
-          .select('id, username, display_name, avatar_url, bio')
+          .select('id, username, display_name, avatar_url, bio, website')
           .in('id', data.map(f => f.follower_id));
         
         if (profileError) throw profileError;
@@ -356,7 +357,7 @@ const Dashboard = () => {
       if (allUserIds.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, username, display_name, avatar_url, bio')
+          .select('id, username, display_name, avatar_url, bio, website')
           .in('id', allUserIds);
 
         if (profilesError) throw profilesError;
@@ -396,7 +397,7 @@ const Dashboard = () => {
       if (postsData && postsData.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, username, display_name, avatar_url, bio')
+          .select('id, username, display_name, avatar_url, bio, website')
           .in('id', postsData.map(p => p.user_id));
 
         if (profilesError) throw profilesError;
@@ -769,9 +770,22 @@ const Dashboard = () => {
                   @{profile?.username || user?.email?.split('@')[0] || 'user'}
                 </p>
                 
-                <p className="text-teal-100 text-sm mb-6">
+                <p className="text-teal-100 text-sm mb-2">
                   {profile?.bio || 'sharing thoughts & creativity'}
                 </p>
+                
+                {profile?.website && (
+                  <a 
+                    href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-teal-100 text-sm mb-4 inline-block hover:text-white underline"
+                  >
+                    🔗 {profile.website.replace(/^https?:\/\//, '')}
+                  </a>
+                )}
+                
+                <div className="mb-6"></div>
                 
                 <Button 
                   variant="outline" 
