@@ -37,6 +37,14 @@ interface Profile {
   avatar_url: string;
 }
 
+interface Post {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  profiles?: Profile;
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, signOut, isAuthenticated } = useAuth();
@@ -46,6 +54,8 @@ const Dashboard = () => {
   const [followers, setFollowers] = useState<Profile[]>([]);
   const [postsCount, setPostsCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState('following');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -149,6 +159,104 @@ const Dashboard = () => {
       console.error('Error fetching posts count:', error);
     }
   };
+
+  const fetchFollowingPosts = async () => {
+    if (!user) return;
+    setPostsLoading(true);
+    try {
+      // First get list of people user follows
+      const { data: followsData, error: followsError } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
+
+      if (followsError) throw followsError;
+
+      if (!followsData || followsData.length === 0) {
+        setPosts([]);
+        return;
+      }
+
+      // Then get posts from those people
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select('id, content, created_at, user_id')
+        .in('user_id', followsData.map(f => f.following_id))
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (postsError) throw postsError;
+
+      // Get profiles for post authors
+      if (postsData && postsData.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, display_name, avatar_url, bio')
+          .in('id', postsData.map(p => p.user_id));
+
+        if (profilesError) throw profilesError;
+
+        // Combine posts with profiles
+        const postsWithProfiles = postsData.map(post => ({
+          ...post,
+          profiles: profilesData?.find(p => p.id === post.user_id)
+        }));
+
+        setPosts(postsWithProfiles);
+      }
+    } catch (error) {
+      console.error('Error fetching following posts:', error);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const fetchHotPosts = async () => {
+    setPostsLoading(true);
+    try {
+      // Get recent posts ordered by creation date (hot posts)
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select('id, content, created_at, user_id')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (postsError) throw postsError;
+
+      // Get profiles for post authors
+      if (postsData && postsData.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, display_name, avatar_url, bio')
+          .in('id', postsData.map(p => p.user_id));
+
+        if (profilesError) throw profilesError;
+
+        // Combine posts with profiles
+        const postsWithProfiles = postsData.map(post => ({
+          ...post,
+          profiles: profilesData?.find(p => p.id === post.user_id)
+        }));
+
+        setPosts(postsWithProfiles);
+      }
+    } catch (error) {
+      console.error('Error fetching hot posts:', error);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  // Fetch posts when filter changes
+  useEffect(() => {
+    if (user) {
+      if (activeFilter === 'following') {
+        fetchFollowingPosts();
+      } else {
+        fetchHotPosts();
+      }
+    }
+  }, [user, activeFilter]);
 
   // Add focus event listener to refetch profile when returning to dashboard
   useEffect(() => {
@@ -399,123 +507,72 @@ const Dashboard = () => {
               }
               onClick={() => setActiveFilter('all')}
             >
-              All Postsys
+              Hot Postsys
             </Button>
           </div>
 
           {/* Posts Feed */}
           <div className="bg-white">
-            {/* First Post with Repost */}
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <Avatar>
-                    {user?.user_metadata?.avatar_url ? (
-                      <AvatarImage src={user.user_metadata.avatar_url} />
-                    ) : null}
-                    <AvatarFallback className="bg-teal-100 text-teal-600">
-                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
-                    <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
-                    <span className="text-gray-500">·</span>
-                    <span className="text-gray-500">18 days ago</span>
-                    <div className="flex items-center gap-2 ml-auto">
-                      <Repeat className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
-                      <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
-                      <MoreHorizontal className="w-5 h-5 text-gray-400 ml-2" />
+            {postsLoading ? (
+              <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading posts...</p>
+              </div>
+            ) : posts.length > 0 ? (
+              posts.map((post, index) => (
+                <div key={post.id} className={`px-6 py-4 ${index < posts.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                      <Avatar>
+                        {post.profiles?.avatar_url ? (
+                          <AvatarImage src={post.profiles.avatar_url} />
+                        ) : null}
+                        <AvatarFallback className="bg-teal-100 text-teal-600">
+                          {(post.profiles?.display_name || post.profiles?.username || 'U').charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 text-sm mb-3">
+                        <span className="font-medium text-gray-900">
+                          {post.profiles?.display_name || post.profiles?.username || 'User'}
+                        </span>
+                        <span className="text-gray-500">
+                          @{post.profiles?.username || 'user'}
+                        </span>
+                        <span className="text-gray-500">·</span>
+                        <span className="text-gray-500">
+                          {new Date(post.created_at).toLocaleDateString()}
+                        </span>
+                        <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
+                      </div>
+                      
+                      <div className="mb-4">
+                        <p className="text-gray-800 mb-4 text-base">{post.content}</p>
+                        <p className="text-gray-500 text-sm">0 comments</p>
+                      </div>
+
+                      <div className="flex items-center gap-3 justify-end">
+                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
+                          <Repeat className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
+                          <Heart className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-gray-500">
+                  {activeFilter === 'following' 
+                    ? "No posts from people you follow yet. Follow some users to see their posts!" 
+                    : "No posts available"}
+                </p>
               </div>
-            </div>
-
-            {/* Second Post */}
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <Avatar>
-                    {user?.user_metadata?.avatar_url ? (
-                      <AvatarImage src={user.user_metadata.avatar_url} />
-                    ) : null}
-                    <AvatarFallback className="bg-teal-100 text-teal-600">
-                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-sm mb-3">
-                    <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
-                    <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
-                    <span className="text-gray-500">·</span>
-                    <span className="text-gray-500">2 mo. ago</span>
-                    <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
-                  </div>
-                  
-                  <div className="mb-4">
-                    <h3 className="text-2xl font-medium mb-2 text-gray-900">finally</h3>
-                    <p className="text-gray-800 mb-4 text-base">a new place to post</p>
-                    <p className="text-gray-500 text-sm">0 comments</p>
-                  </div>
-
-                  <div className="flex items-center gap-3 justify-end">
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
-                      <Edit3 className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Third Post */}
-            <div className="px-6 py-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <Avatar>
-                    {user?.user_metadata?.avatar_url ? (
-                      <AvatarImage src={user.user_metadata.avatar_url} />
-                    ) : null}
-                    <AvatarFallback className="bg-teal-100 text-teal-600">
-                      {(user?.user_metadata?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-sm mb-3">
-                    <span className="font-medium text-gray-900">{user?.user_metadata?.display_name || 'User'}</span>
-                    <span className="text-gray-500">@{user?.email?.split('@')[0] || 'user'}</span>
-                    <span className="text-gray-500">·</span>
-                    <span className="text-gray-500">2 mo. ago</span>
-                    <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
-                  </div>
-                  
-                  <div className="mb-4">
-                    <p className="text-gray-800 mb-4 text-base">in all honesty, i just want another place to talk about my book</p>
-                    <p className="text-gray-500 text-sm">0 comments</p>
-                  </div>
-
-                  <div className="flex items-center gap-3 justify-end">
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
-                      <Repeat className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
