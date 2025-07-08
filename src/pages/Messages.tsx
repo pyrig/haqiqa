@@ -63,7 +63,7 @@ const Messages = () => {
                 .select('user_id')
                 .eq('conversation_id', conversation.id)
                 .neq('user_id', user.id)
-                .single();
+                .maybeSingle();
 
               if (otherParticipant) {
                 // Get participant profile
@@ -71,7 +71,7 @@ const Messages = () => {
                   .from('profiles')
                   .select('id, username, display_name, avatar_url')
                   .eq('id', otherParticipant.user_id)
-                  .single();
+                  .maybeSingle();
 
                 // Get last message
                 const { data: lastMessage } = await supabase
@@ -80,7 +80,7 @@ const Messages = () => {
                   .eq('conversation_id', conversation.id)
                   .order('created_at', { ascending: false })
                   .limit(1)
-                  .single();
+                  .maybeSingle();
 
                 return {
                   ...conversation,
