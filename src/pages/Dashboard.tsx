@@ -935,16 +935,7 @@ const Dashboard = () => {
           )}
 
           {/* Filter Bar */}
-          <div className="p-4 flex gap-2 bg-white border-b border-gray-200" style={{ marginTop: isRefreshing ? '40px' : '0' }}>
-            <Button 
-              size="sm"
-              variant="outline"
-              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-2 py-1 h-auto text-sm"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
+          <div className="p-4 flex gap-2 bg-white" style={{ marginTop: isRefreshing ? '40px' : '0' }}>
             <Button 
               size="sm"
               variant={activeFilter === 'following' ? 'default' : 'outline'}
@@ -966,18 +957,6 @@ const Dashboard = () => {
               onClick={() => setActiveFilter('all')}
             >
               Hot Postsys
-            </Button>
-            
-            {/* Desktop refresh button */}
-            <Button 
-              size="sm"
-              variant="outline"
-              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm ml-auto"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-            >
-              <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Refresh
             </Button>
           </div>
 
