@@ -8,7 +8,6 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
-  pronouns: string;
   avatar_url: string;
 }
 
@@ -44,11 +43,6 @@ const ProfileCard = ({ profile, userEmail }: ProfileCardProps) => {
             <p className="text-teal-100 text-sm mb-2">
               @{profile?.username || userEmail?.split('@')[0] || 'user'}
             </p>
-            
-            <div className="flex items-center justify-center gap-1 text-teal-100 text-sm mb-2">
-              <span>👤</span>
-              <span>{profile?.pronouns || 'they/them'}</span>
-            </div>
             
             <p className="text-teal-100 text-sm mb-6">
               {profile?.bio || 'sharing thoughts & creativity'}

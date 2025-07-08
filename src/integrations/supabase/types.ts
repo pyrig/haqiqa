@@ -333,7 +333,6 @@ export type Database = {
           full_name: string | null
           id: string
           is_private: boolean | null
-          pronouns: string | null
           theme_color: string | null
           updated_at: string | null
           username: string | null
@@ -347,7 +346,6 @@ export type Database = {
           full_name?: string | null
           id: string
           is_private?: boolean | null
-          pronouns?: string | null
           theme_color?: string | null
           updated_at?: string | null
           username?: string | null
@@ -361,7 +359,6 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_private?: boolean | null
-          pronouns?: string | null
           theme_color?: string | null
           updated_at?: string | null
           username?: string | null

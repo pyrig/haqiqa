@@ -11,7 +11,6 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
-  pronouns: string;
   avatar_url: string;
   banner_url?: string;
 }
@@ -20,7 +19,6 @@ interface FormData {
   display_name: string;
   email: string;
   password: string;
-  pronouns: string;
   bio: string;
 }
 
@@ -128,20 +126,6 @@ const ProfileForm = ({
               <p className="text-sm text-gray-500 mt-1">Required to confirm email change</p>
             </div>
           )}
-
-          {/* Pronouns */}
-          <div>
-            <Label htmlFor="pronouns" className="text-sm font-medium text-gray-900 mb-2 block">
-              Pronouns
-            </Label>
-            <Input
-              id="pronouns"
-              value={formData.pronouns}
-              onChange={(e) => setFormData({ ...formData, pronouns: e.target.value })}
-              className="max-w-md"
-              placeholder="he/him"
-            />
-          </div>
 
           {/* Bio */}
           <div>

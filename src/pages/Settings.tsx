@@ -20,7 +20,6 @@ interface Profile {
   username: string;
   display_name: string;
   bio: string;
-  pronouns: string;
   avatar_url: string;
   banner_url?: string;
 }
@@ -34,7 +33,6 @@ const Settings = () => {
     display_name: '',
     email: '',
     password: '',
-    pronouns: '',
     bio: ''
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -67,7 +65,6 @@ const Settings = () => {
             display_name: data.display_name || '',
             email: user?.email || '',
             password: '',
-            pronouns: data.pronouns || '',
             bio: data.bio || ''
           });
         }
@@ -125,7 +122,6 @@ const Settings = () => {
         .from('profiles')
         .update({
           display_name: formData.display_name,
-          pronouns: formData.pronouns,
           bio: formData.bio,
           updated_at: new Date().toISOString()
         })
