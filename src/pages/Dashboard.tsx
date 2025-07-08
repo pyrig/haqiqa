@@ -20,7 +20,8 @@ import {
   Heart,
   Bug,
   Repeat,
-  MoreHorizontal
+  MoreHorizontal,
+  RefreshCw
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,6 +57,9 @@ const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState('following');
   const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [touchStartY, setTouchStartY] = useState(0);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -63,30 +67,30 @@ const Dashboard = () => {
     }
   }, [loading, isAuthenticated, navigate]);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
+  const fetchProfile = async () => {
+    if (!user) return;
 
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-        if (error) {
-          console.error('Error fetching profile:', error);
-          return;
-        }
-
-        if (data) {
-          setProfile(data);
-        }
-      } catch (error) {
-        console.error('Error:', error);
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
       }
-    };
 
+      if (data) {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  useEffect(() => {
     if (user) {
       fetchProfile();
       fetchFollowing();
@@ -320,6 +324,49 @@ const Dashboard = () => {
     }
   };
 
+  // Refresh functions
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Refresh all data
+      await Promise.all([
+        fetchProfile(),
+        fetchFollowing(),
+        fetchFollowers(), 
+        fetchPostsCount(),
+        activeFilter === 'following' ? fetchFollowingPosts() : fetchHotPosts()
+      ]);
+    } finally {
+      setIsRefreshing(false);
+      setPullDistance(0);
+    }
+  };
+
+  // Touch event handlers for pull-to-refresh
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touchY = e.touches[0].clientY;
+    const pullDistance = Math.max(0, touchY - touchStartY);
+    
+    // Only trigger pull-to-refresh if we're at the top of the page
+    if (window.scrollY === 0 && pullDistance > 0) {
+      e.preventDefault();
+      setPullDistance(Math.min(pullDistance, 80));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullDistance > 50) {
+      handleRefresh();
+    } else {
+      setPullDistance(0);
+    }
+    setTouchStartY(0);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -504,10 +551,39 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 bg-white">
+        <div 
+          className="flex-1 bg-white relative"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Pull to refresh indicator */}
+          {pullDistance > 0 && (
+            <div 
+              className="absolute top-0 left-0 right-0 flex items-center justify-center bg-teal-50 border-b border-teal-200 z-10 transition-all duration-200"
+              style={{ height: `${pullDistance}px` }}
+            >
+              <div className="flex items-center gap-2 text-teal-600">
+                <RefreshCw className={`w-4 h-4 ${pullDistance > 50 ? 'animate-spin' : ''}`} />
+                <span className="text-sm">
+                  {pullDistance > 50 ? 'Release to refresh' : 'Pull to refresh'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Refreshing indicator */}
+          {isRefreshing && (
+            <div className="absolute top-0 left-0 right-0 flex items-center justify-center bg-teal-50 border-b border-teal-200 py-2 z-10">
+              <div className="flex items-center gap-2 text-teal-600">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Refreshing...</span>
+              </div>
+            </div>
+          )}
 
           {/* Filter Bar */}
-          <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
+          <div className="p-4 flex gap-2 bg-white border-b border-gray-200" style={{ marginTop: isRefreshing ? '40px' : '0' }}>
             <Button 
               size="sm"
               variant={activeFilter === 'following' ? 'default' : 'outline'}
@@ -529,6 +605,18 @@ const Dashboard = () => {
               onClick={() => setActiveFilter('all')}
             >
               Hot Postsys
+            </Button>
+            
+            {/* Desktop refresh button */}
+            <Button 
+              size="sm"
+              variant="outline"
+              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm ml-auto"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
             </Button>
           </div>
 
