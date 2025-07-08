@@ -78,12 +78,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Panel */}
-      <div className="flex-1 bg-teal-500 text-white p-12 flex flex-col justify-center">
+      <div className="flex-1 bg-teal-500 text-white p-6 sm:p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Welcome back!</h2>
-          <p className="text-lg mb-12 text-center opacity-90 leading-relaxed">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-center">Welcome back!</h2>
+          <p className="text-base sm:text-lg mb-8 sm:mb-12 text-center opacity-90 leading-relaxed">
             Sign in to continue your journey with us and reconnect with your community.
           </p>
           
@@ -122,12 +122,12 @@ const Login = () => {
       </div>
       
       {/* Right Panel */}
-      <div className="flex-1 bg-white p-12 flex flex-col justify-center">
+      <div className="flex-1 bg-white p-6 sm:p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <Link 
               to="/" 
-              className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6"
+              className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-4 sm:mb-6"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -136,10 +136,10 @@ const Login = () => {
               <img 
                 src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
                 alt="Postsy Logo" 
-                className="h-16 mx-auto mb-6"
+                className="h-12 sm:h-16 mx-auto mb-4 sm:mb-6"
               />
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
-              <p className="text-gray-600">Welcome back! Please enter your credentials</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Sign in to your account</h2>
+              <p className="text-gray-600 text-sm sm:text-base">Welcome back! Please enter your credentials</p>
             </div>
           </div>
 

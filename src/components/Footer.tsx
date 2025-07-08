@@ -1,14 +1,14 @@
 const Footer = () => {
   return (
-    <footer className="bg-white py-16 px-8">
+    <footer className="bg-white py-8 sm:py-16 px-4 sm:px-8">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-4 gap-8 mb-12">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 sm:mb-12">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <img 
                 src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
                 alt="Postsy Logo" 
-                className="h-8"
+                className="h-6 sm:h-8"
               />
             </div>
             <p className="text-gray-600 text-sm">
