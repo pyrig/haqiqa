@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Send } from 'lucide-react';
+import { Send, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -123,7 +123,7 @@ const MessageButton = ({ recipientId, recipientName }: MessageButtonProps) => {
           size="sm"
           className="bg-teal-500 hover:bg-teal-600 text-white"
         >
-          Message
+          <Mail className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
