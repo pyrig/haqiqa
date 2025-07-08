@@ -45,6 +45,10 @@ interface Post {
   created_at: string;
   user_id: string;
   profiles?: Profile;
+  likes_count?: number;
+  reposts_count?: number;
+  is_liked?: boolean;
+  is_reposted?: boolean;
 }
 
 const Dashboard = () => {
@@ -167,6 +171,55 @@ const Dashboard = () => {
     }
   };
 
+  // Add interactions data to posts
+  const enrichPostsWithInteractions = async (posts: any[]) => {
+    if (!user || !posts.length) return posts;
+
+    const postIds = posts.map(p => p.id);
+
+    // Get likes counts and user's like status
+    const { data: likesData } = await supabase
+      .from('likes')
+      .select('post_id, user_id')
+      .in('post_id', postIds);
+
+    // Get reposts counts and user's repost status
+    const { data: repostsData } = await supabase
+      .from('reposts')
+      .select('post_id, user_id')
+      .in('post_id', postIds);
+
+    // Process the data
+    const likesMap = new Map();
+    const repostsMap = new Map();
+    const userLikes = new Set();
+    const userReposts = new Set();
+
+    likesData?.forEach(like => {
+      const count = likesMap.get(like.post_id) || 0;
+      likesMap.set(like.post_id, count + 1);
+      if (like.user_id === user.id) {
+        userLikes.add(like.post_id);
+      }
+    });
+
+    repostsData?.forEach(repost => {
+      const count = repostsMap.get(repost.post_id) || 0;
+      repostsMap.set(repost.post_id, count + 1);
+      if (repost.user_id === user.id) {
+        userReposts.add(repost.post_id);
+      }
+    });
+
+    return posts.map(post => ({
+      ...post,
+      likes_count: likesMap.get(post.id) || 0,
+      reposts_count: repostsMap.get(post.id) || 0,
+      is_liked: userLikes.has(post.id),
+      is_reposted: userReposts.has(post.id)
+    }));
+  };
+
   const fetchFollowingPosts = async () => {
     if (!user) return;
     setPostsLoading(true);
@@ -208,7 +261,9 @@ const Dashboard = () => {
           profiles: profilesData?.find(p => p.id === post.user_id)
         }));
 
-        setPosts(postsWithProfiles);
+        // Add interaction data
+        const enrichedPosts = await enrichPostsWithInteractions(postsWithProfiles);
+        setPosts(enrichedPosts);
       } else {
         setPosts([]);
       }
@@ -246,12 +301,94 @@ const Dashboard = () => {
           profiles: profilesData?.find(p => p.id === post.user_id)
         }));
 
-        setPosts(postsWithProfiles);
+        // Add interaction data
+        const enrichedPosts = await enrichPostsWithInteractions(postsWithProfiles);
+        setPosts(enrichedPosts);
       }
     } catch (error) {
       console.error('Error fetching hot posts:', error);
     } finally {
       setPostsLoading(false);
+    }
+  };
+
+  // Handle like/unlike
+  const handleLike = async (postId: string) => {
+    if (!user) return;
+
+    try {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.is_liked) {
+        // Unlike
+        await supabase
+          .from('likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+        
+        // Update local state
+        setPosts(posts.map(p => 
+          p.id === postId 
+            ? { ...p, is_liked: false, likes_count: (p.likes_count || 0) - 1 }
+            : p
+        ));
+      } else {
+        // Like
+        await supabase
+          .from('likes')
+          .insert({ post_id: postId, user_id: user.id });
+        
+        // Update local state
+        setPosts(posts.map(p => 
+          p.id === postId 
+            ? { ...p, is_liked: true, likes_count: (p.likes_count || 0) + 1 }
+            : p
+        ));
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
+
+  // Handle repost/unrepost
+  const handleRepost = async (postId: string) => {
+    if (!user) return;
+
+    try {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.is_reposted) {
+        // Unrepost
+        await supabase
+          .from('reposts')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+        
+        // Update local state
+        setPosts(posts.map(p => 
+          p.id === postId 
+            ? { ...p, is_reposted: false, reposts_count: (p.reposts_count || 0) - 1 }
+            : p
+        ));
+      } else {
+        // Repost
+        await supabase
+          .from('reposts')
+          .insert({ post_id: postId, user_id: user.id });
+        
+        // Update local state
+        setPosts(posts.map(p => 
+          p.id === postId 
+            ? { ...p, is_reposted: true, reposts_count: (p.reposts_count || 0) + 1 }
+            : p
+        ));
+      }
+    } catch (error) {
+      console.error('Error toggling repost:', error);
     }
   };
 
@@ -708,11 +845,27 @@ const Dashboard = () => {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`p-1 flex items-center gap-1 ${post.is_reposted ? 'text-teal-500' : 'text-gray-400 hover:text-teal-500'}`}
+                          onClick={() => handleRepost(post.id)}
+                        >
                           <Repeat className="w-4 h-4" />
+                          {post.reposts_count > 0 && (
+                            <span className="text-xs">{post.reposts_count}</span>
+                          )}
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
-                          <Heart className="w-4 h-4" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`p-1 flex items-center gap-1 ${post.is_liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                          onClick={() => handleLike(post.id)}
+                        >
+                          <Heart className={`w-4 h-4 ${post.is_liked ? 'fill-current' : ''}`} />
+                          {post.likes_count > 0 && (
+                            <span className="text-xs">{post.likes_count}</span>
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -802,11 +955,27 @@ const Dashboard = () => {
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className={`p-1 flex items-center gap-1 ${selectedPost.is_reposted ? 'text-teal-500' : 'text-gray-400 hover:text-teal-500'}`}
+                      onClick={() => handleRepost(selectedPost.id)}
+                    >
                       <Repeat className="w-4 h-4" />
+                      {selectedPost.reposts_count > 0 && (
+                        <span className="text-xs">{selectedPost.reposts_count}</span>
+                      )}
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
-                      <Heart className="w-4 h-4" />
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className={`p-1 flex items-center gap-1 ${selectedPost.is_liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                      onClick={() => handleLike(selectedPost.id)}
+                    >
+                      <Heart className={`w-4 h-4 ${selectedPost.is_liked ? 'fill-current' : ''}`} />
+                      {selectedPost.likes_count > 0 && (
+                        <span className="text-xs">{selectedPost.likes_count}</span>
+                      )}
                     </Button>
                   </div>
                 </div>
