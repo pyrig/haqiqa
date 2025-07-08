@@ -269,10 +269,6 @@ const Settings = () => {
           <Button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-1 h-auto text-sm">
             post
           </Button>
-
-          <span className="text-gray-700 text-sm cursor-pointer hover:text-gray-900" onClick={handleLogout}>
-            sign out
-          </span>
         </div>
       </header>
 
@@ -314,9 +310,9 @@ const Settings = () => {
                 <Button 
                   variant="outline" 
                   className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate(`/profile/${profile?.username || user?.email?.split('@')[0]}`)}
                 >
-                  Edit profile
+                  View profile
                 </Button>
               </div>
             </div>
