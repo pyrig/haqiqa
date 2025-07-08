@@ -45,6 +45,7 @@ const Dashboard = () => {
   const [following, setFollowing] = useState<Profile[]>([]);
   const [followers, setFollowers] = useState<Profile[]>([]);
   const [postsCount, setPostsCount] = useState(0);
+  const [activeFilter, setActiveFilter] = useState('following');
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -380,13 +381,23 @@ const Dashboard = () => {
           <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
             <Button 
               size="sm"
-              className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
+              variant={activeFilter === 'following' ? 'default' : 'outline'}
+              className={activeFilter === 'following' 
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+              }
+              onClick={() => setActiveFilter('following')}
             >
-              following
+              Following
             </Button>
             <Button 
               size="sm"
-              className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
+              variant={activeFilter === 'all' ? 'default' : 'outline'}
+              className={activeFilter === 'all' 
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+              }
+              onClick={() => setActiveFilter('all')}
             >
               All Postsys
             </Button>
