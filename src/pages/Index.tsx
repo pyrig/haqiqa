@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
-import UserPost from "@/components/UserPost";
 import FeatureCard from "@/components/FeatureCard";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
@@ -33,7 +32,13 @@ const Index = () => {
             <div className="absolute top-0 right-0 w-12 sm:w-20 h-12 sm:h-20 bg-teal-200 rounded-full opacity-50"></div>
             <div className="absolute bottom-10 left-5 sm:left-10 w-8 sm:w-12 h-8 sm:h-12 bg-teal-300 rounded-full opacity-60"></div>
             <div className="absolute top-10 sm:top-20 left-0 w-6 sm:w-8 h-6 sm:h-8 bg-teal-400 rounded-full opacity-40"></div>
-            <UserPost />
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <img 
+                src="/lovable-uploads/07979572-d885-43c6-99a0-c432278bce45.png" 
+                alt="Create New Post Interface" 
+                className="w-full h-auto"
+              />
+            </div>
           </div>
         </div>
       </div>
