@@ -3,39 +3,34 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Settings, Users, FileText, Edit } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Heart, Repeat, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import FeedPostCard from '@/components/FeedPostCard';
 
 interface Profile {
   id: string;
   username: string;
   display_name: string;
-  full_name: string;
   bio: string;
-  pronouns: string;
   avatar_url: string;
   created_at: string;
-  theme_color: string;
 }
 
 interface Post {
   id: string;
   content: string;
-  is_anonymous: boolean;
-  hashtags: string[];
   created_at: string;
-  media_urls?: string[];
-  content_warning?: string;
-  privacy_level?: string;
   user_id: string;
-  profiles?: {
-    username: string;
-    display_name: string;
-    avatar_url: string;
-  };
+  profiles?: Profile;
+}
+
+interface Reply {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  post_id: string;
+  profiles?: Profile;
 }
 
 const Profile = () => {
@@ -44,7 +39,10 @@ const Profile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [replies, setReplies] = useState<Reply[]>([]);
   const [loading, setLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('postsys');
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
@@ -69,32 +67,13 @@ const Profile = () => {
 
         setProfile(profileData);
 
-        // Fetch user's posts
-        const { data: postsData, error: postsError } = await supabase
+        // Fetch counts
+        const { count: postsCountData } = await supabase
           .from('posts')
-          .select('*')
-          .eq('user_id', profileData.id)
-          .eq('is_anonymous', false)
-          .order('created_at', { ascending: false });
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', profileData.id);
 
-        if (postsError) {
-          console.error('Error fetching posts:', postsError);
-        } else {
-          // Add profile data to each post
-          const postsWithProfiles = (postsData || []).map(post => ({
-            ...post,
-            media_urls: Array.isArray(post.media_urls) ? post.media_urls as string[] : [],
-            hashtags: post.hashtags || [],
-            profiles: {
-              username: profileData.username,
-              display_name: profileData.display_name,
-              avatar_url: profileData.avatar_url
-            }
-          } as Post));
-          
-          setPosts(postsWithProfiles);
-          setPostsCount(postsWithProfiles.length);
-        }
+        setPostsCount(postsCountData || 0);
 
         // Check if current user is following this profile
         if (user && user.id !== profileData.id) {
@@ -134,6 +113,77 @@ const Profile = () => {
     fetchProfile();
   }, [username, user]);
 
+  const fetchPosts = async () => {
+    if (!profile) return;
+    setPostsLoading(true);
+    try {
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select('id, content, created_at, user_id')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (postsError) throw postsError;
+
+      if (postsData && postsData.length > 0) {
+        const postsWithProfiles = postsData.map(post => ({
+          ...post,
+          profiles: profile
+        }));
+
+        setPosts(postsWithProfiles);
+      } else {
+        setPosts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const fetchReplies = async () => {
+    if (!profile) return;
+    setPostsLoading(true);
+    try {
+      const { data: repliesData, error: repliesError } = await supabase
+        .from('replies')
+        .select('id, content, created_at, user_id, post_id')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (repliesError) throw repliesError;
+
+      if (repliesData && repliesData.length > 0) {
+        const repliesWithProfiles = repliesData.map(reply => ({
+          ...reply,
+          profiles: profile
+        }));
+
+        setReplies(repliesWithProfiles);
+      } else {
+        setReplies([]);
+      }
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  // Fetch posts/replies when filter changes
+  useEffect(() => {
+    if (profile) {
+      if (activeFilter === 'postsys') {
+        fetchPosts();
+      } else {
+        fetchReplies();
+      }
+    }
+  }, [profile, activeFilter]);
+
   const handleFollowToggle = async () => {
     if (!user || !profile) return;
 
@@ -160,6 +210,39 @@ const Profile = () => {
       }
     } catch (error) {
       console.error('Error toggling follow:', error);
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setPosts(posts.filter(post => post.id !== postId));
+      setPostsCount(prev => prev - 1);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  const handleDeleteReply = async (replyId: string) => {
+    try {
+      const { error } = await supabase
+        .from('replies')
+        .delete()
+        .eq('id', replyId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setReplies(replies.filter(reply => reply.id !== replyId));
+    } catch (error) {
+      console.error('Error deleting reply:', error);
     }
   };
 
@@ -204,115 +287,254 @@ const Profile = () => {
   const isOwnProfile = user?.id === profile.id;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-            <h1 className="text-xl font-semibold">{profile.display_name || profile.username}</h1>
-          </div>
-          {isOwnProfile && (
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/settings')}
-              className="flex items-center gap-2"
-            >
-              <Settings className="w-4 h-4" />
-              Settings
-            </Button>
-          )}
+    <div className="min-h-screen bg-gray-50 font-sans">
+      {/* Top Header */}
+      <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          <img 
+            src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
+            alt="Postsy Logo" 
+            className="h-8"
+          />
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto p-6">
-        {/* Profile Header */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border mb-6">
-          <div className="flex items-start gap-4">
-            <Avatar className="w-20 h-20">
-              {profile.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} />
-              ) : null}
-              <AvatarFallback className="bg-teal-100 text-teal-600 text-xl">
-                {(profile.display_name || profile.username).charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <h2 className="text-xl font-bold">{profile.display_name || profile.username}</h2>
-                  <p className="text-gray-500">@{profile.username}</p>
-                  {profile.pronouns && (
-                    <p className="text-gray-600 text-sm">👤 {profile.pronouns}</p>
-                  )}
+      <div className="flex">
+        {/* Left Sidebar */}
+        <div className="w-80 bg-white">
+          <div className="p-4">
+            {/* Profile Card */}
+            <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
+              <div className="p-6 text-white text-center">
+                <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20">
+                  <Avatar className="w-full h-full">
+                    {profile.avatar_url ? (
+                      <AvatarImage src={profile.avatar_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-teal-600 text-white text-2xl">
+                      {(profile.display_name || profile.username).charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
+                
+                <h2 className="text-xl font-medium mb-1">
+                  {profile.display_name || profile.username}
+                </h2>
+                
+                <p className="text-teal-100 text-sm mb-2">
+                  @{profile.username}
+                </p>
+                
+                <p className="text-teal-100 text-sm mb-6">
+                  {profile.bio || 'No bio yet'}
+                </p>
+                
                 {!isOwnProfile && (
                   <Button 
+                    variant="outline" 
+                    className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
                     onClick={handleFollowToggle}
-                    className={isFollowing ? "bg-gray-200 text-gray-800 hover:bg-gray-300" : "bg-teal-500 hover:bg-teal-600 text-white"}
                   >
                     {isFollowing ? 'Following' : 'Follow'}
                   </Button>
                 )}
               </div>
-              
-              {profile.bio && (
-                <p className="text-gray-800 mb-3">{profile.bio}</p>
-              )}
-              
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>Joined {new Date(profile.created_at).toLocaleDateString()}</span>
+            </div>
+
+            {/* Stats */}
+            <div className="space-y-3">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Posts</span>
+                  <span className="font-bold text-teal-600">{postsCount}</span>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-1">
-                  <FileText className="w-4 h-4" />
-                  <span className="font-medium">{postsCount}</span>
-                  <span className="text-gray-500">Postsys</span>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Following</span>
+                  <span className="font-bold text-teal-600">{followingCount}</span>
                 </div>
-                <div className="flex items-center gap-1 cursor-pointer hover:underline">
-                  <Users className="w-4 h-4" />
-                  <span className="font-medium">{followingCount}</span>
-                  <span className="text-gray-500">Following</span>
-                </div>
-                <div className="flex items-center gap-1 cursor-pointer hover:underline">
-                  <Users className="w-4 h-4" />
-                  <span className="font-medium">{followersCount}</span>
-                  <span className="text-gray-500">Followers</span>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Followers</span>
+                  <span className="font-bold text-teal-600">{followersCount}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Posts Feed */}
-        <div>
-          {posts.length === 0 ? (
-            <div className="bg-white rounded-lg p-8 shadow-sm border text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
-              <p className="text-gray-600">
-                {isOwnProfile ? "Share your first post!" : "This user hasn't posted anything yet."}
-              </p>
-            </div>
-          ) : (
-            <div>
-              {posts.map((post) => (
-                <FeedPostCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
+        {/* Main Content */}
+        <div className="flex-1 bg-white">
+          {/* Filter Bar */}
+          <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
+            <Button 
+              size="sm"
+              variant={activeFilter === 'postsys' ? 'default' : 'outline'}
+              className={activeFilter === 'postsys' 
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+              }
+              onClick={() => setActiveFilter('postsys')}
+            >
+              Postsys
+            </Button>
+            <Button 
+              size="sm"
+              variant={activeFilter === 'replies' ? 'default' : 'outline'}
+              className={activeFilter === 'replies' 
+                ? "bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium" 
+                : "text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
+              }
+              onClick={() => setActiveFilter('replies')}
+            >
+              Replies
+            </Button>
+          </div>
+
+          {/* Content Feed */}
+          <div className="bg-white">
+            {postsLoading ? (
+              <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading...</p>
+              </div>
+            ) : activeFilter === 'postsys' ? (
+              posts.length > 0 ? (
+                posts.map((post, index) => (
+                  <div key={post.id} className={`px-6 py-4 ${index < posts.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                        <Avatar>
+                          {post.profiles?.avatar_url ? (
+                            <AvatarImage src={post.profiles.avatar_url} />
+                          ) : null}
+                          <AvatarFallback className="bg-teal-100 text-teal-600">
+                            {(post.profiles?.display_name || post.profiles?.username || 'U').charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm mb-3">
+                          <span className="font-medium text-gray-900">
+                            {post.profiles?.display_name || post.profiles?.username || 'User'}
+                          </span>
+                          <span className="text-gray-500">
+                            @{post.profiles?.username || 'user'}
+                          </span>
+                          <span className="text-gray-500">·</span>
+                          <span className="text-gray-500">
+                            {new Date(post.created_at).toLocaleDateString()}
+                          </span>
+                          <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
+                        </div>
+                        
+                        <div className="mb-4">
+                          <p className="text-gray-800 mb-4 text-base">{post.content}</p>
+                          <p className="text-gray-500 text-sm">0 comments</p>
+                        </div>
+
+                        <div className="flex items-center gap-3 justify-end">
+                          {isOwnProfile && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-gray-400 hover:text-red-500 p-1"
+                              onClick={() => handleDeletePost(post.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
+                            <Repeat className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
+                            <Heart className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 text-center">
+                  <p className="text-gray-500">No posts yet</p>
+                </div>
+              )
+            ) : (
+              replies.length > 0 ? (
+                replies.map((reply, index) => (
+                  <div key={reply.id} className={`px-6 py-4 ${index < replies.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                        <Avatar>
+                          {reply.profiles?.avatar_url ? (
+                            <AvatarImage src={reply.profiles.avatar_url} />
+                          ) : null}
+                          <AvatarFallback className="bg-teal-100 text-teal-600">
+                            {(reply.profiles?.display_name || reply.profiles?.username || 'U').charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm mb-3">
+                          <span className="font-medium text-gray-900">
+                            {reply.profiles?.display_name || reply.profiles?.username || 'User'}
+                          </span>
+                          <span className="text-gray-500">
+                            @{reply.profiles?.username || 'user'}
+                          </span>
+                          <span className="text-gray-500">·</span>
+                          <span className="text-gray-500">
+                            {new Date(reply.created_at).toLocaleDateString()}
+                          </span>
+                          <span className="text-gray-500">· Reply</span>
+                          <MoreHorizontal className="w-5 h-5 text-gray-400 ml-auto" />
+                        </div>
+                        
+                        <div className="mb-4">
+                          <p className="text-gray-800 mb-4 text-base">{reply.content}</p>
+                        </div>
+
+                        <div className="flex items-center gap-3 justify-end">
+                          {isOwnProfile && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-gray-400 hover:text-red-500 p-1"
+                              onClick={() => handleDeleteReply(reply.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-500 p-1">
+                            <Repeat className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 p-1">
+                            <Heart className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 text-center">
+                  <p className="text-gray-500">No replies yet</p>
+                </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>
