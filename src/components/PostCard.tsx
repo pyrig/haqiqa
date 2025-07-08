@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle, RotateCcw, Share } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Replies from './Replies';
+import ReplyComposer from './ReplyComposer';
 import { useReplies } from '@/hooks/useReplies';
 
 interface Post {
@@ -27,8 +28,13 @@ interface PostCardProps {
 
 const PostCard = ({ post }: PostCardProps) => {
   const [showReplies, setShowReplies] = useState(false);
+  const [showQuickReply, setShowQuickReply] = useState(false);
   const { replies } = useReplies(post.id);
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
+
+  const handleQuickReplyPosted = () => {
+    setShowQuickReply(false);
+  };
   
   const displayName = post.is_anonymous 
     ? 'Anonymous' 
@@ -101,10 +107,18 @@ const PostCard = ({ post }: PostCardProps) => {
           variant="ghost" 
           size="sm" 
           className="flex items-center gap-1 hover:text-gray-700"
-          onClick={() => setShowReplies(!showReplies)}
+          onClick={() => setShowQuickReply(!showQuickReply)}
         >
           <MessageCircle className="w-4 h-4" />
-          <span className="text-sm">Reply ({replies.length})</span>
+          <span className="text-sm">Quick Reply</span>
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center gap-1 hover:text-gray-700"
+          onClick={() => setShowReplies(!showReplies)}
+        >
+          <span className="text-sm">View Replies ({replies.length})</span>
         </Button>
         <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-gray-700">
           <RotateCcw className="w-4 h-4" />
@@ -115,6 +129,13 @@ const PostCard = ({ post }: PostCardProps) => {
           <span className="text-sm">Share</span>
         </Button>
       </div>
+
+      {/* Quick Reply Composer */}
+      {showQuickReply && (
+        <div className="border-t pt-4 mt-4">
+          <ReplyComposer postId={post.id} onReplyPosted={handleQuickReplyPosted} />
+        </div>
+      )}
 
       {/* Show first 2 replies preview */}
       {replies.length > 0 && (
