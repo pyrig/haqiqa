@@ -678,7 +678,22 @@ const Dashboard = () => {
         
         {/* Search Bar */}
         <div className="flex-1 max-w-md mx-4">
-          <SearchBar placeholder="Search users and hashtags..." />
+          <SearchBar 
+            placeholder="Search users and hashtags..." 
+            onResultSelect={(result) => {
+              if (result.type === 'user') {
+                // Navigate to user profile using username from subtitle
+                const username = result.subtitle?.replace('@', '') || result.title.toLowerCase().replace(/\s+/g, '');
+                navigate(`/profile/${username}`);
+              } else if (result.type === 'hashtag') {
+                // For hashtags, we could implement a hashtag page or filter posts
+                toast({
+                  title: "Hashtag search",
+                  description: `Searching for ${result.title}`,
+                });
+              }
+            }}
+          />
         </div>
         
         <div className="flex items-center gap-3">
