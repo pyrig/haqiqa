@@ -14,8 +14,8 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <div className="text-center lg:text-left relative">
             <div className="absolute -top-10 -right-10 w-12 sm:w-20 h-12 sm:h-20 bg-teal-200 rounded-full opacity-50"></div>
-            <div className="absolute -bottom-5 -left-12 w-8 sm:w-12 h-8 sm:h-12 bg-teal-300 rounded-full opacity-60"></div>
-            <div className="absolute top-1/2 -left-16 w-6 sm:w-8 h-6 sm:h-8 bg-teal-400 rounded-full opacity-40"></div>
+            <div className="absolute -bottom-5 -left-20 w-8 sm:w-12 h-8 sm:h-12 bg-teal-300 rounded-full opacity-60"></div>
+            <div className="absolute top-1/2 -left-24 w-6 sm:w-8 h-6 sm:h-8 bg-teal-400 rounded-full opacity-40"></div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-gray-900 mb-4 sm:mb-6 leading-tight">
               sharing made simple.
             </h1>
