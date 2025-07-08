@@ -253,24 +253,10 @@ const Dashboard = () => {
               following
             </Button>
             <Button 
-              variant="outline"
-              size="sm"
-              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
-            >
-              hide shares
-            </Button>
-            <Button 
               size="sm"
               className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 h-auto text-sm font-medium"
             >
-              All Postsy
-            </Button>
-            <Button 
-              variant="outline"
-              size="sm"
-              className="text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-1 h-auto text-sm"
-            >
-              hide replies
+              All Postsys
             </Button>
           </div>
 
