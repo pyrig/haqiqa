@@ -313,25 +313,10 @@ const Profile = () => {
         {/* Left Sidebar */}
         <div className="w-80 bg-white">
           <div className="p-4">
-            {/* Profile Card with Banner */}
-            <div className="rounded-lg overflow-hidden mb-4">
-              {/* Banner */}
-              {profile.banner_url ? (
-                <div className="h-24 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400 relative">
-                  <img 
-                    src={profile.banner_url} 
-                    alt="Profile banner" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="h-24 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
-              )}
-              
-              {/* Profile Content */}
-              <div className="bg-teal-500 p-6 text-white text-center relative">
-                {/* Avatar positioned to overlap banner */}
-                <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20 -mt-10 relative z-10 bg-teal-500">
+            {/* Profile Card */}
+            <div className="rounded-lg overflow-hidden mb-4 bg-teal-500">
+              <div className="p-6 text-white text-center">
+                <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white/20">
                   <Avatar className="w-full h-full">
                     {profile.avatar_url ? (
                       <AvatarImage src={profile.avatar_url} />
@@ -351,7 +336,7 @@ const Profile = () => {
                 </p>
                 
                 <p className="text-teal-100 text-sm mb-6">
-                  {profile.bio || 'No bio yet'}
+                  {profile.bio || "No bio yet"}
                 </p>
                 
                 {!isOwnProfile && (
@@ -360,7 +345,7 @@ const Profile = () => {
                     className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 rounded-lg font-medium"
                     onClick={handleFollowToggle}
                   >
-                    {isFollowing ? 'Following' : 'Follow'}
+                    {isFollowing ? "Following" : "Follow"}
                   </Button>
                 )}
               </div>
@@ -392,6 +377,19 @@ const Profile = () => {
 
         {/* Main Content */}
         <div className="flex-1 bg-white">
+          {/* Banner */}
+          {profile.banner_url ? (
+            <div className="h-48 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400 relative">
+              <img 
+                src={profile.banner_url} 
+                alt="Profile banner" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-48 bg-gradient-to-br from-teal-200 via-teal-300 to-teal-400"></div>
+          )}
+          
           {/* Filter Bar */}
           <div className="p-4 flex gap-2 bg-white border-b border-gray-200">
             <Button 
