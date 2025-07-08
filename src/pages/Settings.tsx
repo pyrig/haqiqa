@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import AvatarUpload from "@/components/AvatarUpload";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -342,19 +343,14 @@ const Settings = () => {
               {/* Profile Picture */}
               <div>
                 <Label className="text-sm font-medium text-gray-900 mb-3 block">Profile Picture</Label>
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-16 h-16">
-                    {profile?.avatar_url ? (
-                      <AvatarImage src={profile.avatar_url} />
-                    ) : null}
-                    <AvatarFallback className="bg-teal-100 text-teal-600 text-xl">
-                      {(profile?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Button variant="outline" size="sm" className="text-teal-600 border-teal-200 hover:bg-teal-50">
-                    Change
-                  </Button>
-                </div>
+                <AvatarUpload
+                  currentAvatarUrl={profile?.avatar_url}
+                  userId={user?.id || ''}
+                  displayName={profile?.display_name || user?.email?.split('@')[0]}
+                  onAvatarUpdate={(newAvatarUrl) => {
+                    setProfile(prev => prev ? { ...prev, avatar_url: newAvatarUrl } : null);
+                  }}
+                />
               </div>
 
               {/* Banner Image */}
