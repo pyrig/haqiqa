@@ -34,13 +34,19 @@ const Messages = () => {
       if (!user) return;
 
       try {
+        console.log('Fetching conversations for user:', user.id);
         // Get conversations where user is a participant
         const { data: participantData, error: participantError } = await supabase
           .from('conversation_participants')
           .select('conversation_id')
           .eq('user_id', user.id);
 
-        if (participantError) throw participantError;
+        if (participantError) {
+          console.error('Participant error:', participantError);
+          throw participantError;
+        }
+
+        console.log('Participant data:', participantData);
 
         if (participantData && participantData.length > 0) {
           const conversationIds = participantData.map(p => p.conversation_id);
@@ -97,7 +103,12 @@ const Messages = () => {
             })
           );
 
-          setConversations(conversationsWithDetails.filter(c => c.other_participant));
+          const filteredConversations = conversationsWithDetails.filter(c => c.other_participant);
+          console.log('Final conversations:', filteredConversations);
+          setConversations(filteredConversations);
+        } else {
+          console.log('No participant data found');
+          setConversations([]);
         }
       } catch (error) {
         console.error('Error fetching conversations:', error);
