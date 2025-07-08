@@ -953,7 +953,16 @@ const Dashboard = () => {
           )}
 
           {/* Filter Bar */}
-          <div className="p-4 flex gap-2 bg-white" style={{ marginTop: isRefreshing ? '40px' : '0' }}>
+          <div className="p-4 flex items-center gap-2 bg-white" style={{ marginTop: isRefreshing ? '40px' : '0' }}>
+            <Button 
+              variant="ghost"
+              size="sm"
+              className="text-gray-600 hover:text-teal-600 hover:bg-teal-50 p-1 h-auto"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
             <Button 
               size="sm"
               variant={activeFilter === 'following' ? 'default' : 'outline'}
