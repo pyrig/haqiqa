@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, RotateCcw, Share } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { MessageCircle, RotateCcw, Share, Plus } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Replies from './Replies';
 import ReplyComposer from './ReplyComposer';
@@ -29,6 +30,7 @@ interface PostCardProps {
 const PostCard = ({ post }: PostCardProps) => {
   const [showReplies, setShowReplies] = useState(false);
   const [showQuickReply, setShowQuickReply] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const { replies } = useReplies(post.id);
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
 
@@ -58,8 +60,12 @@ const PostCard = ({ post }: PostCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border mb-6">
-      <div className="flex items-center gap-3 mb-4">
+    <>
+      <div 
+        className="bg-white rounded-lg p-6 shadow-sm border mb-6 cursor-pointer hover:shadow-md transition-shadow"
+        onClick={() => setShowModal(true)}
+      >
+        <div className="flex items-center gap-3 mb-4">
         <Avatar className="w-10 h-10">
           {!post.is_anonymous && post.profiles?.avatar_url ? (
             <AvatarImage src={post.profiles.avatar_url} />
@@ -107,7 +113,10 @@ const PostCard = ({ post }: PostCardProps) => {
           variant="ghost" 
           size="sm" 
           className="flex items-center gap-1 hover:text-gray-700"
-          onClick={() => setShowQuickReply(!showQuickReply)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowQuickReply(!showQuickReply);
+          }}
         >
           <MessageCircle className="w-4 h-4" />
           <span className="text-sm">Quick Reply</span>
@@ -116,15 +125,28 @@ const PostCard = ({ post }: PostCardProps) => {
           variant="ghost" 
           size="sm" 
           className="flex items-center gap-1 hover:text-gray-700"
-          onClick={() => setShowReplies(!showReplies)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowReplies(!showReplies);
+          }}
         >
           <span className="text-sm">View Replies ({replies.length})</span>
         </Button>
-        <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-gray-700">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center gap-1 hover:text-gray-700"
+          onClick={(e) => e.stopPropagation()}
+        >
           <RotateCcw className="w-4 h-4" />
           <span className="text-sm">Save</span>
         </Button>
-        <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-gray-700">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center gap-1 hover:text-gray-700"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Share className="w-4 h-4" />
           <span className="text-sm">Share</span>
         </Button>
@@ -197,6 +219,79 @@ const PostCard = ({ post }: PostCardProps) => {
         onToggle={() => setShowReplies(!showReplies)} 
       />
     </div>
+
+    {/* Modal Popup */}
+    <Dialog open={showModal} onOpenChange={setShowModal}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader className="flex flex-row items-center justify-between p-0">
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
+              alt="Postsy Logo" 
+              className="h-6"
+            />
+          </div>
+          <div className="flex-1 flex justify-center">
+            <Button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Create New Post
+            </Button>
+          </div>
+        </DialogHeader>
+        
+        <div className="mt-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Avatar className="w-10 h-10">
+              {!post.is_anonymous && post.profiles?.avatar_url ? (
+                <AvatarImage src={post.profiles.avatar_url} />
+              ) : null}
+              <AvatarFallback className={post.is_anonymous ? "bg-gray-100 text-gray-600" : "bg-teal-100 text-teal-600"}>
+                {post.is_anonymous ? 'A' : displayName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-medium">{displayName}</div>
+              <div className="text-sm text-gray-500">
+                {username} {username && '•'} {timeAgo.replace('about ', '')}
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-gray-800 mb-4 whitespace-pre-wrap">
+            {renderContentWithHashtags(post.content)}
+          </div>
+          
+          {post.hashtags && post.hashtags.length > 0 && (
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {post.hashtags.map((tag, index) => {
+                const colors = [
+                  'text-teal-600 bg-teal-50',
+                  'text-blue-600 bg-blue-50',
+                  'text-purple-600 bg-purple-50',
+                  'text-green-600 bg-green-50',
+                  'text-orange-600 bg-orange-50',
+                  'text-red-600 bg-red-50'
+                ];
+                const colorClass = colors[index % colors.length];
+                
+                return (
+                  <Badge key={index} variant="secondary" className={`${colorClass} hover:opacity-80 cursor-pointer`}>
+                    #{tag}
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
+
+          <Replies 
+            postId={post.id} 
+            isOpen={true} 
+            onToggle={() => {}} 
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  </>
   );
 };
 
