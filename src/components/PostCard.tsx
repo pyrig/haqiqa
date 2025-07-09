@@ -223,15 +223,13 @@ const PostCard = ({ post }: PostCardProps) => {
     {/* Modal Popup */}
     <Dialog open={showModal} onOpenChange={setShowModal}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between p-0">
-          <div className="flex items-center">
+        <DialogHeader className="flex flex-row items-center justify-center p-0">
+          <div className="flex items-center gap-3">
             <img 
               src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
               alt="Postsy Logo" 
               className="h-6"
             />
-          </div>
-          <div className="flex-1 flex justify-center">
             <Button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Create New Post
