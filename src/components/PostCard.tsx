@@ -223,14 +223,18 @@ const PostCard = ({ post }: PostCardProps) => {
     {/* Modal Popup */}
     <Dialog open={showModal} onOpenChange={setShowModal}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-center p-0">
+        <DialogHeader className="flex flex-row items-center justify-center p-4 border-b">
           <div className="flex items-center gap-3">
             <img 
               src="/lovable-uploads/24441693-0248-4339-9e32-08a834c45d4e.png" 
               alt="Postsy Logo" 
-              className="h-6"
+              className="h-8 w-auto"
+              onError={(e) => {
+                console.log("Logo failed to load:", e);
+                e.currentTarget.style.display = 'none';
+              }}
             />
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+            <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Create New Post
             </Button>
